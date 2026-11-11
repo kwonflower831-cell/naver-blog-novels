@@ -1,0 +1,20 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Temporary & SQLite databases
+*.db
+*.sqlite3
+cookies_temp.db
+
+# Chrome / User profile caches
+*chrome-naver-profile*
+*profile*
+UserData/
+
+# Logs and environment
+*.log
+.env
+.DS_Store
+Thumbs.db
