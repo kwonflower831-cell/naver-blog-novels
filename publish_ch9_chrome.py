@@ -146,9 +146,7 @@ def main():
         time.sleep(3.5)
 
         if is_login_required(page):
-            print("Login required! Clearing old session cookies...", flush=True)
-            ctx.clear_cookies()
-            time.sleep(0.5)
+            print("Login required! Waiting for login...", flush=True)
             page.goto("https://nid.naver.com/nidlogin.login?url=https%3A%2F%2Fblog.naver.com%2Fkwonflower58%3FRedirect%3DWrite%26", wait_until="domcontentloaded", timeout=60000)
             page.bring_to_front()
             bring_window_to_top()
