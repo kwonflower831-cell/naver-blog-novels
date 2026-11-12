@@ -16,3 +16,5 @@
   - 실행: `python novel_checker.py <장번호 또는 파일경로> [--novel yupum|lasttalk] [--fix] [--promote]`
   - 예시: `python novel_checker.py 9` (ch9-draft.txt 및 사실 장부 자동 점검)
   - 검증 완료 후 게시본 확정 승급: `python novel_checker.py 9 --promote` (ch9-published.txt 자동 생성)
+- GitHub 백업 규칙:
+  - 사용자가 `"GitHub에 올려"`(또는 `"github에 올려"`, `"깃허브에 올려"`)라고 요청하면 `python auto_backup.py`를 실행해 변경된 원고·설정·스크립트를 `naver-blog-novels` 비공개 저장소에 커밋·푸시한다. (커밋 전 `.git/hooks/pre-commit`이 스테이징된 원고에 대해 `novel_checker.py --strict` 검사를 자동 실행한다.)
