@@ -7,12 +7,16 @@ on:
       - "novel-yupum-text/*.txt"
       - "novel-lasttalk-text/*.txt"
       - "novel_checker.py"
+      - "ci_report.py"
       - ".github/workflows/novel-check.yml"
   pull_request:
     paths:
       - "novel-yupum-text/*.txt"
       - "novel-lasttalk-text/*.txt"
       - "novel_checker.py"
+      - "ci_report.py"
+  schedule:
+    - cron: "0 0 * * *" # 매일 한국 시간 오전 9:00 (UTC 00:00)
   workflow_dispatch:
 
 jobs:
@@ -27,32 +31,5 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: 원고 서식·분량·지침 일괄 검증
-        run: |
-          python - <<'PY'
-          import glob
-          import subprocess
-          import sys
-
-          targets = [
-              ("yupum", sorted(glob.glob("novel-yupum-text/ch*-draft.txt") + glob.glob("novel-yupum-text/ch*-published.txt"))),
-              ("lasttalk", sorted(glob.glob("novel-lasttalk-text/ch*-draft.txt") + glob.glob("novel-lasttalk-text/ch*-published.txt"))),
-          ]
-
-          failed = []
-          checked = 0
-          for novel, files in targets:
-              for path in files:
-                  checked += 1
-                  print(f"\n>>> Checking [{novel}] {path}")
-                  res = subprocess.run(
-                      [sys.executable, "novel_checker.py", path, "--novel", novel, "--strict"]
-                  )
-                  if res.returncode != 0:
-                      failed.append(path)
-
-          print(f"\n총 {checked}개 원고 검증 완료 (실패: {len(failed)}건)")
-          if failed:
-              print("실패 파일:", ", ".join(failed))
-              sys.exit(1)
-          PY
+      - name: 원고 서식·분량·지침 일괄 검증 및 요약 리포트
+        run: python ci_report.py
