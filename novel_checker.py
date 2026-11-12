@@ -390,6 +390,7 @@ def main():
     parser.add_argument("--ledger", "-l", help="사실 장부 마크다운 파일 경로 (.md)", default=None)
     parser.add_argument("--fix", action="store_true", help="연속 공백 등 안전한 교정 사항 자동 적용")
     parser.add_argument("--promote", "-p", action="store_true", help="검증 통과 시 chN-published.txt로 저장/승급")
+    parser.add_argument("--strict", action="store_true", help="필수 오류가 1건 이상이면 종료 코드 1 반환 (CI용)")
     parser.add_argument("--out", help="교정 결과 저장 파일 경로")
     
     args = parser.parse_args()
@@ -420,6 +421,9 @@ def main():
             with open(published_file, "w", encoding="utf-8") as f:
                 f.write(checker.raw_text)
             print(f"{GREEN}[O] 검증 통과 - 게시본 확정 생성: {published_file}{RESET}")
+
+    if args.strict and checker.errors:
+        sys.exit(1)
 
 if __name__ == "__main__":
     main()

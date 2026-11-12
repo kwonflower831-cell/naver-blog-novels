@@ -15,6 +15,7 @@ UserData/
 
 # Logs and environment
 *.log
+*.bak
 .env
 .DS_Store
 Thumbs.db
