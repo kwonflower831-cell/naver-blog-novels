@@ -69,6 +69,9 @@ def main():
         elif "novel-tumyeong" in fname:
             if "투명" not in tags:
                 tags.append("투명")
+        elif "content-templates" in fname:
+            if "콘텐츠템플릿" not in tags:
+                tags.append("콘텐츠템플릿")
         elif "outline" in fname or "ledger" in fname or "guidelines" in fname:
             if "설정·장부" not in tags:
                 tags.append("설정·장부")
