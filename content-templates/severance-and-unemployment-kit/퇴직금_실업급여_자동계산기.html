@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2026 최신 퇴직금 & 실업급여 모의 계산기</title>
+  <style>
+    :root {
+      --primary: #059669;
+      --primary-hover: #047857;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --accent: #3b82f6;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Segoe UI", Roboto, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); padding: 24px 16px; line-height: 1.6; }
+    .container { max-width: 680px; margin: 0 auto; background: var(--card-bg); border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); padding: 28px 24px; }
+    header { text-align: center; margin-bottom: 24px; }
+    .badge { display: inline-block; padding: 4px 12px; background: #ecfdf5; color: var(--primary); font-size: 0.8rem; font-weight: 700; border-radius: 999px; margin-bottom: 8px; }
+    h1 { font-size: 1.55rem; color: #0f172a; margin-bottom: 6px; }
+    header p { font-size: 0.9rem; color: var(--text-muted); }
+
+    .tabs { display: flex; gap: 8px; margin-bottom: 24px; border-bottom: 2px solid var(--border); padding-bottom: 8px; }
+    .tab-btn { flex: 1; padding: 12px; background: #f1f5f9; border: none; border-radius: 8px; font-size: 0.95rem; font-weight: 600; color: var(--text-muted); cursor: pointer; transition: all 0.2s; }
+    .tab-btn.active { background: var(--primary); color: white; }
+
+    .calc-section { display: none; }
+    .calc-section.active { display: block; }
+
+    .form-group { margin-bottom: 18px; }
+    label { display: block; font-size: 0.88rem; font-weight: 600; margin-bottom: 6px; color: #334155; }
+    .input-wrapper { position: relative; display: flex; align-items: center; }
+    input, select { width: 100%; padding: 12px 14px; font-size: 1rem; border: 1.5px solid var(--border); border-radius: 8px; outline: none; transition: border-color 0.2s; }
+    input:focus, select:focus { border-color: var(--primary); }
+    .unit { position: absolute; right: 14px; color: var(--text-muted); font-size: 0.9rem; pointer-events: none; }
+    .helper { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; }
+
+    .btn-calc { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 1.05rem; font-weight: 600; cursor: pointer; transition: background 0.2s; margin-top: 10px; }
+    .btn-calc:hover { background: var(--primary-hover); }
+
+    .result-box { margin-top: 24px; padding: 20px; border-radius: 12px; background: #f0fdf4; border: 1.5px solid #bbf7d0; display: none; }
+    .result-title { font-size: 1.1rem; font-weight: 700; color: #166534; margin-bottom: 14px; border-bottom: 1px dashed #86efac; padding-bottom: 8px; }
+    .stat-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.95rem; }
+    .stat-row strong { color: #0f172a; }
+    .highlight-val { font-size: 1.35rem; color: var(--primary); font-weight: 800; }
+
+    .info-card { margin-top: 16px; padding: 14px; background: white; border-radius: 8px; border-left: 4px solid var(--primary); font-size: 0.88rem; color: #334155; }
+    .info-card h4 { font-size: 0.92rem; margin-bottom: 4px; color: #0f172a; }
+
+    footer { text-align: center; margin-top: 28px; font-size: 0.8rem; color: var(--text-muted); }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <span class="badge">2026년 고용노동부 기준</span>
+    <h1>퇴직금 & 실업급여 모의 계산기</h1>
+    <p>법정 퇴직금 예상액과 구직급여(실업급여) 수급액을 간편하게 계산합니다.</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('severance')">💰 퇴직금 계산기</button>
+    <button class="tab-btn" onclick="switchTab('unemployment')">📋 실업급여 계산기</button>
+  </div>
+
+  <!-- 퇴직금 계산 섹션 -->
+  <div id="severanceSection" class="calc-section active">
+    <div class="form-group">
+      <label for="joinDate">입사일</label>
+      <input type="date" id="joinDate">
+    </div>
+    <div class="form-group">
+      <label for="leaveDate">퇴사일 (마지막 근무일 다음 날)</label>
+      <input type="date" id="leaveDate">
+    </div>
+    <div class="form-group">
+      <label for="recent3MonthsPay">퇴직 전 3개월간 기본급 + 고정수당 총액 (세전)</label>
+      <div class="input-wrapper">
+        <input type="number" id="recent3MonthsPay" placeholder="예: 9000000 (월 300만원씩 3개월)">
+        <span class="unit">원</span>
+      </div>
+      <p class="helper">세전 총 지급액 기준 (식대, 차량유지비 등 비과세 포함)</p>
+    </div>
+    <div class="form-group">
+      <label for="annualBonus">최근 1년간 지급받은 상여금 총액 (없으면 0)</label>
+      <div class="input-wrapper">
+        <input type="number" id="annualBonus" placeholder="0" value="0">
+        <span class="unit">원</span>
+      </div>
+    </div>
+    <button class="btn-calc" onclick="calcSeverance()">예상 퇴직금 계산하기</button>
+
+    <div id="sevResult" class="result-box">
+      <div class="result-title">💰 퇴직금 계산 결과</div>
+      <div class="stat-row">
+        <span>총 재직일수:</span>
+        <strong id="sevDays">0일</strong>
+      </div>
+      <div class="stat-row">
+        <span>1일 평균임금:</span>
+        <strong id="sevDailyAvg">0원</strong>
+      </div>
+      <div class="stat-row" style="margin-top: 10px; border-top: 1px solid #bbf7d0; padding-top: 10px;">
+        <span style="font-size: 1.05rem; font-weight: 700;">예상 법정 퇴직금(세전):</span>
+        <span class="highlight-val" id="sevTotal">0원</span>
+      </div>
+      <div class="info-card">
+        <h4>💡 법정 퇴직금 수급 조건</h4>
+        <p>주 15시간 이상, 1년(365일) 이상 계속 근로한 근로자(아르바이트, 계약직 포함)라면 누구나 100% 수급 대상입니다. 퇴사일로부터 14일 이내 지급되어야 합니다.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 실업급여 계산 섹션 -->
+  <div id="unemploymentSection" class="calc-section">
+    <div class="form-group">
+      <label for="empAge">퇴사 당시 만 나이</label>
+      <div class="input-wrapper">
+        <input type="number" id="empAge" placeholder="예: 32" value="30">
+        <span class="unit">세</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="insureDuration">고용보험 총 가입 기간 (피보험 기간)</label>
+      <select id="insureDuration">
+        <option value="1">1년 미만 (180일 이상 충족)</option>
+        <option value="2">1년 이상 ~ 3년 미만</option>
+        <option value="3" selected>3년 이상 ~ 5년 미만</option>
+        <option value="4">5년 이상 ~ 10년 미만</option>
+        <option value="5">10년 이상</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="monthlyAvgPay">퇴사 전 3개월간 월 평균 급여 (세전)</label>
+      <div class="input-wrapper">
+        <input type="number" id="monthlyAvgPay" placeholder="예: 3000000">
+        <span class="unit">원</span>
+      </div>
+      <p class="helper">1일 8시간 근무 기준 (주 40시간)</p>
+    </div>
+    <button class="btn-calc" onclick="calcUnemployment()">예상 실업급여 계산하기</button>
+
+    <div id="unempResult" class="result-box">
+      <div class="result-title">📋 구직급여(실업급여) 계산 결과</div>
+      <div class="stat-row">
+        <span>1일 구직급여 수급액:</span>
+        <strong id="unempDaily">0원</strong>
+      </div>
+      <div class="stat-row">
+        <span>총 소정급여일수 (수급 기간):</span>
+        <strong id="unempDurationDays">0일 (약 0개월)</strong>
+      </div>
+      <div class="stat-row" style="margin-top: 10px; border-top: 1px solid #bbf7d0; padding-top: 10px;">
+        <span style="font-size: 1.05rem; font-weight: 700;">총 예상 수급액 (비과세):</span>
+        <span class="highlight-val" id="unempTotal">0원</span>
+      </div>
+      <div class="info-card">
+        <h4>💡 실업급여 필수 수급 요건</h4>
+        <p>① 이직일 이전 18개월간 고용보험 가입일수 180일 이상<br>② 비자발적 퇴사 (권고사직, 계약만료, 폐업 등)<br>※ 실업급여는 소득세가 부과되지 않는 전액 비과세 혜택입니다.</p>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>※ 본 계산기는 근로기준법 및 고용보험법에 따른 모의 계산 도구이며, 실제 지급액은 고용센터 및 사업장 산정 기준에 따라 소폭 다를 수 있습니다.</p>
+  </footer>
+</div>
+
+<script>
+function switchTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.calc-section').forEach(s => s.classList.remove('active'));
+  if (tab === 'severance') {
+    document.querySelectorAll('.tab-btn')[0].classList.add('active');
+    document.getElementById('severanceSection').classList.add('active');
+  } else {
+    document.querySelectorAll('.tab-btn')[1].classList.add('active');
+    document.getElementById('unemploymentSection').classList.add('active');
+  }
+}
+
+function calcSeverance() {
+  const join = document.getElementById('joinDate').value;
+  const leave = document.getElementById('leaveDate').value;
+  const pay = parseFloat(document.getElementById('recent3MonthsPay').value) || 0;
+  const bonus = parseFloat(document.getElementById('annualBonus').value) || 0;
+
+  if (!join || !leave || pay <= 0) {
+    alert('입사일, 퇴사일, 3개월 급여를 정확히 입력해 주세요.');
+    return;
+  }
+
+  const d1 = new Date(join);
+  const d2 = new Date(leave);
+  const diffDays = Math.floor((d2 - d1) / (1000 * 60 * 60 * 24));
+
+  if (diffDays < 1) {
+    alert('퇴사일은 입사일보다 이후여야 합니다.');
+    return;
+  }
+
+  if (diffDays < 365) {
+    alert(`총 재직일수가 ${diffDays}일입니다. 법정 퇴직금은 365일(1년) 이상 근무 시에만 발생합니다.`);
+    return;
+  }
+
+  // 3개월 일수 약 91일 기준
+  const dailyAvg = (pay + (bonus * (3/12))) / 91.25;
+  const severance = dailyAvg * 30 * (diffDays / 365);
+
+  document.getElementById('sevDays').innerText = `${diffDays.toLocaleString()}일 (약 ${(diffDays / 365).toFixed(1)}년)`;
+  document.getElementById('sevDailyAvg').innerText = `${Math.round(dailyAvg).toLocaleString()}원`;
+  document.getElementById('sevTotal').innerText = `${Math.round(severance).toLocaleString()}원`;
+  document.getElementById('sevResult').style.display = 'block';
+}
+
+function calcUnemployment() {
+  const age = parseInt(document.getElementById('empAge').value) || 30;
+  const durationTier = parseInt(document.getElementById('insureDuration').value) || 3;
+  const monthlyPay = parseFloat(document.getElementById('monthlyAvgPay').value) || 0;
+
+  if (monthlyPay <= 0) {
+    alert('월 평균 급여를 입력해 주세요.');
+    return;
+  }
+
+  // 2026년 기준 실업급여 상한액 / 하한액 (1일 8시간 기준)
+  // 상한액: 66,000원, 하한액: 최저임금 기준 약 63,104원 ~ 64,000원 수준
+  const maxDaily = 66000;
+  const minDaily = 64192; // 2026 최저임금 반영 추정 하한액
+
+  const dailyRaw = (monthlyPay / 30) * 0.6;
+  let dailyBenefit = Math.max(minDaily, Math.min(maxDaily, dailyRaw));
+
+  // 소정급여일수 매트릭스 (나이 50세 기준 분기)
+  const isOver50 = age >= 50;
+  let benefitDays = 120;
+  if (durationTier === 1) {
+    benefitDays = 120;
+  } else if (durationTier === 2) {
+    benefitDays = isOver50 ? 180 : 150;
+  } else if (durationTier === 3) {
+    benefitDays = isOver50 ? 210 : 180;
+  } else if (durationTier === 4) {
+    benefitDays = isOver50 ? 240 : 210;
+  } else {
+    benefitDays = isOver50 ? 270 : 240;
+  }
+
+  const totalBenefit = dailyBenefit * benefitDays;
+
+  document.getElementById('unempDaily').innerText = `${Math.round(dailyBenefit).toLocaleString()}원 / 일`;
+  document.getElementById('unempDurationDays').innerText = `${benefitDays}일 (약 ${(benefitDays / 30).toFixed(1)}개월)`;
+  document.getElementById('unempTotal').innerText = `${Math.round(totalBenefit).toLocaleString()}원`;
+  document.getElementById('unempResult').style.display = 'block';
+}
+</script>
+
+</body>
+</html>
