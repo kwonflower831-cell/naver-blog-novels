@@ -90,11 +90,11 @@ class NovelChecker:
             self.errors.append(f"첫 줄에 허구 안내 문구가 없습니다: '{first_line[:30]}...'")
 
         last_line_num, last_line = self.non_empty_lines[-1]
-        footer_pattern = r"^\((\d+장에\s*계속|끝)\)$"
+        footer_pattern = r"^\((\d+[장화]에\s*계속|끝|완결)\)$"
         if re.search(footer_pattern, last_line.strip()):
             self.passes.append(f"끝 줄 형식 확인: '{last_line.strip()}' (줄 {last_line_num})")
         else:
-            self.errors.append(f"마지막 줄이 '(N장에 계속)' 또는 '(끝)' 형식이 아닙니다: '{last_line}' (줄 {last_line_num})")
+            self.errors.append(f"마지막 줄이 '(N장에 계속)' 또는 '(N화에 계속)' 또는 '(끝)' 형식이 아닙니다: '{last_line}' (줄 {last_line_num})")
 
     def check_length(self):
         """2. 글자 수 검사 (권장: 2,200 ~ 3,500자)"""

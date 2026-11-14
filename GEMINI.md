@@ -18,3 +18,5 @@
   - 검증 완료 후 게시본 확정 승급: `python novel_checker.py 9 --promote` (ch9-published.txt 자동 생성)
 - GitHub 백업 규칙:
   - 사용자가 `"GitHub에 올려"`(또는 `"github에 올려"`, `"깃허브에 올려"`)라고 요청하면 `python auto_backup.py`를 실행해 변경된 원고·설정·스크립트를 `naver-blog-novels` 비공개 저장소에 커밋·푸시한다. (커밋 전 `.git/hooks/pre-commit`이 스테이징된 원고에 대해 `novel_checker.py --strict` 검사를 자동 실행한다.)
+- 블로그 발행 규칙:
+  - 네이버 블로그에 포스팅을 발행할 때는 사용자가 수동 복사/붙여넣기나 발행 버튼을 누르도록 안내하지 않고, 에이전트가 자체 전용 자동화 브라우저(Playwright / 2번 방식)를 구동하여 제목·본문·태그 자동 입력 및 최종 발행 버튼 클릭까지 100% 무인 전자동으로 처리한다.
