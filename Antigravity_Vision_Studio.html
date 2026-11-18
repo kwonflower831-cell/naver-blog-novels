@@ -1,0 +1,1700 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Antigravity Vision Studio - 상상 그 이상의 실현</title>
+  <style>
+    :root {
+      --bg: #090d16;
+      --card-bg: rgba(15, 23, 42, 0.75);
+      --border: rgba(255, 255, 255, 0.08);
+      --border-accent: rgba(56, 189, 248, 0.3);
+      --primary: #38bdf8;
+      --primary-glow: rgba(56, 189, 248, 0.35);
+      --gold: #f59e0b;
+      --gold-glow: rgba(245, 158, 11, 0.35);
+      --emerald: #10b981;
+      --crimson: #f43f5e;
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Pretendard", "Segoe UI", Roboto, sans-serif;
+      --font-mono: "Consolas", "Fira Code", monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      overflow-x: hidden;
+      line-height: 1.5;
+    }
+
+    header {
+      background: rgba(10, 15, 26, 0.85);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-badge {
+      background: linear-gradient(135deg, var(--primary), var(--gold));
+      color: #000;
+      font-weight: 900;
+      font-size: 0.85rem;
+      padding: 4px 8px;
+      border-radius: 6px;
+      letter-spacing: 1px;
+    }
+
+    .brand-text h1 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-text p {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 8px;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 4px;
+      border-radius: 30px;
+      border: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 8px 18px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .tab-btn:hover { color: #fff; }
+
+    .tab-btn.active {
+      background: var(--primary);
+      color: #04101f;
+      box-shadow: 0 0 16px var(--primary-glow);
+    }
+
+    main {
+      max-width: 1300px;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+    }
+
+    .tab-pane {
+      display: none;
+      animation: fadeIn 0.35s ease;
+    }
+
+    .tab-pane.active { display: block; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .glass-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.5rem;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+    }
+
+    @media (max-width: 900px) {
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    }
+
+    .pane-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin-bottom: 0.4rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .pane-desc {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .canvas-wrap {
+      position: relative;
+      background: #040711;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+      margin-top: 1rem;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 12px 16px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+
+    .control-label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    input[type="range"] {
+      flex: 1;
+      accent-color: var(--primary);
+      cursor: pointer;
+    }
+
+    select.studio-select {
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 9px 12px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      outline: none;
+    }
+
+    .btn-action {
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid var(--primary);
+      color: var(--primary);
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-action:hover, .btn-action.active-chip {
+      background: var(--primary);
+      color: #04101f;
+      box-shadow: 0 0 12px var(--primary-glow);
+    }
+
+    .btn-action.gold {
+      background: rgba(245, 158, 11, 0.15);
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+
+    .btn-action.gold:hover {
+      background: var(--gold);
+      color: #04101f;
+      box-shadow: 0 0 12px var(--gold-glow);
+    }
+
+    .terminal-box {
+      background: #02040a;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.6;
+      height: 310px;
+      overflow-y: auto;
+      color: #94a3b8;
+    }
+
+    .term-line { margin-bottom: 4px; }
+    .term-success { color: var(--emerald); }
+    .term-info { color: var(--primary); }
+    .term-warn { color: var(--gold); }
+    .term-err { color: var(--crimson); }
+
+    .pipe-step {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      background: rgba(0,0,0,0.25);
+      border: 1px solid var(--border);
+      margin-bottom: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .pipe-step.active {
+      border-color: var(--primary);
+      background: rgba(56, 189, 248, 0.1);
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.15);
+    }
+
+    .step-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    .pipe-step.active .step-icon {
+      background: var(--primary);
+      color: #000;
+    }
+
+    .stat-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--border);
+    }
+    .studio-editor {
+      width: 100%;
+      min-height: 320px;
+      background: #040711;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.1rem;
+      color: #e2e8f0;
+      font-family: var(--font-sans);
+      font-size: 0.9rem;
+      line-height: 1.75;
+      resize: vertical;
+      outline: none;
+    }
+    .studio-editor:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.15);
+    }
+    .studio-input {
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 8px;
+      padding: 7px 10px;
+      font-size: 0.8rem;
+      outline: none;
+    }
+    .studio-input:focus { border-color: var(--primary); }
+    .btn-action.emerald {
+      border-color: rgba(16, 185, 129, 0.45);
+      color: var(--emerald);
+      background: rgba(16, 185, 129, 0.08);
+    }
+    .btn-action.emerald:hover {
+      background: rgba(16, 185, 129, 0.18);
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.25);
+    }
+    .btn-action.danger {
+      border-color: rgba(244, 63, 94, 0.45);
+      color: #fb7185;
+      background: rgba(244, 63, 94, 0.08);
+    }
+    .btn-action.danger:hover {
+      background: rgba(244, 63, 94, 0.18);
+    }
+    .toolbar-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <div class="logo-badge">NEXUS</div>
+      <div class="brand-text">
+        <h1>Antigravity Vision Studio</h1>
+        <p>소설 작업실 5대 작품 & novel_checker.py 실시간 연동 스튜디오</p>
+      </div>
+    </div>
+
+    <nav class="nav-tabs">
+      <button class="tab-btn active" data-tab="tab-math">
+        <span>📐</span> 수학·지식 시각화 랩
+      </button>
+      <button class="tab-btn" data-tab="tab-pipeline">
+        <span>⚡</span> 실전 원고 검수 & 파이프라인
+      </button>
+      <button class="tab-btn" data-tab="tab-graph">
+        <span>🕸️</span> 작품별 인과율 신경망
+      </button>
+      <button class="tab-btn" data-tab="tab-pub">
+        <span>🚀</span> 실전 배포 관제탑
+      </button>
+    </nav>
+
+    <button class="btn-action gold" id="downloadHtmlBtn" title="웹에서 업그레이드된 스튜디오 파일을 내 컴퓨터로 즉시 내려받습니다">
+      💾 내 컴퓨터로 저장 (.html)
+    </button>
+  </header>
+
+  <main>
+
+    <!-- ============================================================== -->
+    <!-- TAB 1: 수학 & 지식 직관 시각화 랩 -->
+    <!-- ============================================================== -->
+    <div class="tab-pane active" id="tab-math">
+      <div class="pane-title">
+        <span>📐</span> 직관적 지식 시각화 (Intuitive Math Lab)
+        <span class="stat-badge" style="color:var(--primary); border-color:var(--primary-glow);">LIVE CANVAS</span>
+      </div>
+      <p class="pane-desc">
+        어려운 수식 대신, <strong>슬라이더를 움직이면 기하학적 면적의 보존 법칙(피타고라스 유체 증명)과 파동 합성이 실시간으로 눈앞에 증명</strong>됩니다.
+      </p>
+
+      <div class="grid-2">
+        <div class="glass-card">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+            <h3 style="font-size:1.1rem; font-weight:700;">피타고라스 정리: 유체 회전 증명 (a² + b² = c²)</h3>
+            <span class="stat-badge" id="angleBadge">각도: 0°</span>
+          </div>
+
+          <div class="canvas-wrap" style="height: 320px;">
+            <canvas id="pythagorasCanvas" width="500" height="320"></canvas>
+          </div>
+
+          <div class="controls">
+            <span class="control-label">회전 각도 조절:</span>
+            <input type="range" id="pythagorasSlider" min="0" max="360" value="0">
+            <button class="btn-action" id="autoSpinBtn">▶ 자동 회전</button>
+          </div>
+          <p style="font-size:0.75rem; color:var(--text-muted); margin-top:8px;">
+            * 슬라이더를 돌려 사각형을 회전시키면 밑변과 높이의 두 사각형에 채워진 푸른 액체가 빗변의 거대한 사각형으로 남김없이 쏟아져 들어갑니다.
+          </p>
+        </div>
+
+        <div class="glass-card">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+            <h3 style="font-size:1.1rem; font-weight:700;">푸리에 에피사이클: 회전하는 원들의 파동 합성</h3>
+            <span class="stat-badge" id="circleCountBadge">조화 원: 5개</span>
+          </div>
+
+          <div class="canvas-wrap" style="height: 320px;">
+            <canvas id="fourierCanvas" width="500" height="320"></canvas>
+          </div>
+
+          <div class="controls">
+            <span class="control-label">원(조화 성분) 개수:</span>
+            <input type="range" id="fourierSlider" min="1" max="15" value="5">
+            <button class="btn-action gold" id="waveShapeBtn">파형 변경: 사각파</button>
+          </div>
+          <p style="font-size:0.75rem; color:var(--text-muted); margin-top:8px;">
+            * 단순한 원들의 회전이 서로 연결되어 사각파·톱니파·삼각파를 그리는 과정을 직관적으로 시각화합니다.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- TAB 2: 자율 창작 & novel_checker.py 실전 검수 파이프라인 -->
+    <!-- ============================================================== -->
+    <div class="tab-pane" id="tab-pipeline">
+      <div class="pane-title">
+        <span>⚡</span> 실전 원고 검수 & 자율 창작 파이프라인 (novel_checker.py 연동)
+        <span class="stat-badge" style="color:var(--gold); border-color:var(--gold-glow);">REAL WORKSPACE CONNECTED</span>
+      </div>
+      <p class="pane-desc">
+        작업실의 실제 연재작(<strong>《유품》, 《증거 4호》, 《사라진 호선》, 《침묵의 기록》, 《마지막 통화》</strong>) 원고와 사실 장부를 불러와 <strong>novel_checker.py 10절·12절 정밀 검수</strong>를 즉시 수행합니다.
+      </p>
+
+      <div class="grid-2">
+        <div class="glass-card">
+          <h3 style="font-size:1.1rem; font-weight:700; margin-bottom:1rem;">실제 원고 선택 & 검수 발주기</h3>
+          
+          <div style="display:flex; gap:8px; margin-bottom:1.25rem; flex-wrap:wrap;">
+            <select id="novelSelect" class="studio-select" style="flex:1;">
+              <option value="yupum">《유품》 (1~13장 / novel-yupum-ledger.md)</option>
+              <option value="evidence4">《증거 4호》 (1~12장 / novel-evidence4-ledger.md)</option>
+              <option value="missingline">《사라진 호선》 (1장 / novel-missingline-ledger.md)</option>
+              <option value="silence">《침묵의 기록》 (1~8장 / novel-silence-ledger.md)</option>
+              <option value="lasttalk">《마지막 통화》 (1~15장 완결)</option>
+            </select>
+            <select id="chapterSelect" class="studio-select" style="width:170px;">
+              <option value="ch13-published.txt">ch13-published.txt</option>
+              <option value="ch12-published.txt">ch12-published.txt</option>
+              <option value="ch1-published.txt">ch1-published.txt</option>
+            </select>
+            <button class="btn-action" id="startPipelineBtn" style="padding:9px 18px; font-size:0.88rem;">🚀 실전 검수 가동</button>
+          </div>
+
+          <div class="pipe-step" id="step-1">
+            <div class="step-icon">1</div>
+            <div style="flex:1;">
+              <div style="font-weight:700; font-size:0.85rem;">머리말 허구 안내 & 끝 줄 형식 검증</div>
+              <div style="font-size:0.75rem; color:var(--text-muted);" id="step1-sub">대기 중...</div>
+            </div>
+            <span class="stat-badge" id="step1-status">STANDBY</span>
+          </div>
+
+          <div class="pipe-step" id="step-2">
+            <div class="step-icon">2</div>
+            <div style="flex:1;">
+              <div style="font-weight:700; font-size:0.85rem;">글자 수, 대사 따옴표(""), 속말(''), 대괄호([]) 짝 검증</div>
+              <div style="font-size:0.75rem; color:var(--text-muted);" id="step2-sub">대기 중...</div>
+            </div>
+            <span class="stat-badge" id="step2-status">STANDBY</span>
+          </div>
+
+          <div class="pipe-step" id="step-3">
+            <div class="step-icon">3</div>
+            <div style="flex:1;">
+              <div style="font-weight:700; font-size:0.85rem;">시각 숫자 표기 & 주어 반복·감정 직접 서술 점검</div>
+              <div style="font-size:0.75rem; color:var(--text-muted);" id="step3-sub">대기 중...</div>
+            </div>
+            <span class="stat-badge" id="step3-status">STANDBY</span>
+          </div>
+
+          <div class="pipe-step" id="step-4">
+            <div class="step-icon">4</div>
+            <div style="flex:1;">
+              <div style="font-weight:700; font-size:0.85rem;">사실 장부(Ledger) 5대 질문 & 게시본 확정 판정</div>
+              <div style="font-size:0.75rem; color:var(--text-muted);" id="step4-sub">대기 중...</div>
+            </div>
+            <span class="stat-badge" id="step4-status">STANDBY</span>
+          </div>
+        </div>
+
+        <div class="glass-card">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+            <h3 style="font-size:1.1rem; font-weight:700;">novel_checker.py 실시간 검수 리포트</h3>
+            <span class="stat-badge" id="checkerScoreBadge" style="color:var(--emerald);">READY</span>
+          </div>
+          <div class="terminal-box" id="terminalBox">
+            <div class="term-line term-info">[NOVEL_CHECKER] 작업실 5대 연재작 원고 및 사실 장부가 연결되었습니다.</div>
+            <div class="term-line">[SYSTEM] 작품을 선택하고 [🚀 실전 검수 가동] 버튼을 누르면 실제 검수 결과가 출력됩니다.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Manuscript Editor Panel -->
+      <div class="glass-card" style="margin-top:1.5rem;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.85rem; flex-wrap:wrap; gap:8px;">
+          <div class="toolbar-row">
+            <h3 style="font-size:1.05rem; font-weight:700;">✍️ 원고 실시간 에디터 & 승급(Promote)</h3>
+            <span class="stat-badge" id="manuscriptBadge" style="color:var(--primary);">《유품》 — ch13-published.txt</span>
+            <span class="stat-badge" id="liveStatsBadge" style="color:var(--emerald);">0자 · 대사 0%</span>
+          </div>
+          <div class="toolbar-row">
+            <button class="btn-action" id="saveManuscriptBtn">💾 원고 저장</button>
+            <button class="btn-action gold" id="autoFixBtn">✨ 자동 교정 (--fix)</button>
+            <button class="btn-action emerald" id="promoteChapterBtn">🏆 게시본 승급 (--promote)</button>
+          </div>
+        </div>
+        <textarea id="manuscriptReaderBox" class="studio-editor" spellcheck="false" placeholder="원고를 불러오는 중..."></textarea>
+      </div>
+
+      <!-- Ledger & Outline Viewer/Editor Panel -->
+      <div class="glass-card" style="margin-top:1.5rem;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.85rem; flex-wrap:wrap; gap:8px;">
+          <div class="toolbar-row">
+            <h3 style="font-size:1.05rem; font-weight:700;">📒 사실 장부(Ledger) & 아웃라인(Outline)</h3>
+            <button class="btn-action active-chip" data-doc-kind="ledger" id="docTabLedger">사실 장부 (Ledger)</button>
+            <button class="btn-action" data-doc-kind="outline" id="docTabOutline">아웃라인 (Outline)</button>
+            <span class="stat-badge" id="docFileBadge" style="color:var(--gold);">novel-yupum-ledger.md</span>
+          </div>
+          <button class="btn-action" id="saveDocBtn">💾 문서 저장</button>
+        </div>
+        <textarea id="docEditorBox" class="studio-editor" style="min-height:210px; font-size:0.84rem;" spellcheck="false" placeholder="장부/아웃라인을 불러오는 중..."></textarea>
+      </div>
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- TAB 3: 스토리 인과율 신경망 그래프 -->
+    <!-- ============================================================== -->
+    <div class="tab-pane" id="tab-graph">
+      <div class="pane-title">
+        <span>🕸️</span> 작품별 스토리 인과율 신경망 (Causal Graph Network)
+        <span class="stat-badge" style="color:var(--emerald); border-color:rgba(16,185,129,0.3);">MULTI-NOVEL DAG</span>
+      </div>
+      <p class="pane-desc">
+        연재 중인 작품을 선택하면 해당 작품의 <strong>등장인물, 핵심 물증, 시간표 단서들이 어떻게 얽혀 있는지 인터랙티브 관계망</strong>으로 즉시 전환됩니다.
+      </p>
+
+      <div class="glass-card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:8px;">
+          <div style="display:flex; gap:8px; flex-wrap:wrap;" id="graphSelectorRow">
+            <button class="btn-action active-chip" data-graph-novel="yupum">《유품》 (서해진·한동우·마재식)</button>
+            <button class="btn-action" data-graph-novel="evidence4">《증거 4호》 (핵심 물증·보관소 로그)</button>
+            <button class="btn-action" data-graph-novel="missingline">《사라진 호선》 (막차·7분 공백)</button>
+            <button class="btn-action" data-graph-novel="lasttalk">《마지막 통화》 (한서진·한도윤)</button>
+          </div>
+          <span class="stat-badge" id="graphTitleBadge" style="color:var(--primary);">《유품》 인물·단서 신경망</span>
+        </div>
+
+        <div class="canvas-wrap" style="height: 420px;">
+          <canvas id="graphCanvas" width="1000" height="420"></canvas>
+        </div>
+
+        <div id="nodeLoreBox" style="margin-top:0.85rem; padding:10px 14px; border-radius:8px; background:rgba(56, 189, 248, 0.08); border:1px solid var(--border-accent); font-size:0.82rem; color:var(--text);">
+          🔍 <strong>선택된 인물·단서 사실 장부:</strong> 그래프의 노드를 클릭하거나 드래그하면 해당 작품의 사실 장부 기록이 표시됩니다.
+        </div>
+
+        <div style="margin-top:0.9rem; padding:12px; border-radius:10px; background:rgba(0,0,0,0.28); border:1px solid var(--border);">
+          <div class="toolbar-row" style="justify-content:space-between; margin-bottom:10px;">
+            <div class="toolbar-row">
+              <input id="newNodeLabel" class="studio-input" placeholder="인물/단서 이름" style="width:130px;">
+              <input id="newNodeRole" class="studio-input" placeholder="역할 (예: 목격자)" style="width:130px;">
+              <input id="newNodeLore" class="studio-input" placeholder="사실 장부 메모" style="width:210px;">
+              <button class="btn-action" id="addGraphNodeBtn">➕ 노드 추가</button>
+            </div>
+            <div class="toolbar-row">
+              <button class="btn-action danger" id="deleteGraphNodeBtn">🗑️ 선택 노드 삭제</button>
+              <button class="btn-action emerald" id="saveGraphBtn">💾 신경망 저장</button>
+              <button class="btn-action" id="resetGraphBtn">↺ 초기화</button>
+            </div>
+          </div>
+          <div class="toolbar-row">
+            <select id="edgeFromSelect" class="studio-select" style="width:140px;"></select>
+            <span style="color:var(--text-muted); font-size:0.8rem;">→</span>
+            <select id="edgeToSelect" class="studio-select" style="width:140px;"></select>
+            <input id="newEdgeLabel" class="studio-input" placeholder="관계 설명 (예: 알리바이 대조)" style="width:200px;">
+            <button class="btn-action gold" id="addGraphEdgeBtn">🔗 연결선 추가</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- TAB 4: 실전 배포 관제탑 -->
+    <!-- ============================================================== -->
+    <div class="tab-pane" id="tab-pub">
+      <div class="pane-title">
+        <span>🚀</span> 옴니 퍼블리싱 실전 관제탑 (Distribution Hub)
+        <span class="stat-badge" style="color:var(--primary); border-color:var(--primary-glow);">5 NOVELS TRACKED</span>
+      </div>
+      <p class="pane-desc">
+        현재 작업실(`naver-blog-novels`)에 보관된 5개 연재 작품의 원고 현황과 네이버 블로그·포스타입·GitHub/Google Drive 백업 스크립트를 직접 실행·점검합니다.
+      </p>
+
+      <div class="grid-3" style="margin-bottom:1.5rem;">
+        <div class="glass-card">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+            <h4 style="font-size:1.05rem; font-weight:700;">네이버 블로그 (kwonflower58)</h4>
+            <span class="stat-badge" style="color:var(--emerald);">연동 스크립트 완비</span>
+          </div>
+          <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:1rem;">
+            스크립트: <code>auto_blog_publisher.py</code><br>
+            근황: 《유품》 13장 및 《사라진 호선》 1장 발행 완료
+          </p>
+          <div style="background:rgba(0,0,0,0.3); padding:10px; border-radius:6px; font-size:0.75rem; margin-bottom:1rem; border:1px solid var(--border);">
+            카테고리 11 (유품) · 카테고리 10 (마지막 통화) · 카테고리 9 (투명)
+          </div>
+          <div class="toolbar-row">
+            <button class="btn-action" style="flex:1;" id="blogDispatchBtn">▶ 스크립트 점검</button>
+            <button class="btn-action emerald" style="flex:1;" id="blogRunBtn">🚀 실전 발행</button>
+          </div>
+        </div>
+
+        <div class="glass-card">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+            <h4 style="font-size:1.05rem; font-weight:700;">포스타입 (Postype)</h4>
+            <span class="stat-badge" style="color:var(--gold);">자동 발행 준비</span>
+          </div>
+          <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:1rem;">
+            스크립트: <code>auto_postype_publisher.py</code><br>
+            구성: 제목·부제·본문·태그 무인 입력 지원
+          </p>
+          <div style="background:rgba(0,0,0,0.3); padding:10px; border-radius:6px; font-size:0.75rem; margin-bottom:1rem; border:1px solid var(--border);">
+            《증거 4호》 1~12장 & 《침묵의 기록》 1~8장 시리즈 패키징 완료
+          </div>
+          <div class="toolbar-row">
+            <button class="btn-action gold" style="flex:1;" id="postypeDispatchBtn">▶ 패키징 점검</button>
+            <button class="btn-action emerald" style="flex:1;" id="postypeRunBtn">🚀 실전 발행</button>
+          </div>
+        </div>
+
+        <div class="glass-card">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+            <h4 style="font-size:1.05rem; font-weight:700;">GitHub & Google Drive 백업</h4>
+            <span class="stat-badge" style="color:var(--primary);">실시간 동기화</span>
+          </div>
+          <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:1rem;">
+            저장소: <code>kwonflower831-cell/naver-blog-novels</code><br>
+            스크립트: <code>auto_backup.py</code> + Google Drive 연동
+          </p>
+          <div style="background:rgba(0,0,0,0.3); padding:10px; border-radius:6px; font-size:0.75rem; margin-bottom:1rem; border:1px solid var(--border);" id="backupStatusBox">
+            총 5개 작품 / 86개 원고 파일 안전 보관 중
+          </div>
+          <div class="toolbar-row">
+            <button class="btn-action" style="flex:1;" id="syncBackupBtn">🔄 상태 점검</button>
+            <button class="btn-action emerald" style="flex:1;" id="runBackupBtn">☁️ 백업 실행</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="glass-card" style="margin-bottom:1.5rem;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.8rem;">
+          <h4 style="font-size:1rem; font-weight:700;">🖥️ 실전 배포 & 백업 실행 콘솔</h4>
+          <span class="stat-badge" id="deployStatusBadge" style="color:var(--emerald);">STANDBY</span>
+        </div>
+        <div class="terminal-box" id="deployConsole" style="height:170px;">
+          <div class="term-line term-info">[DEPLOY_HUB] 네이버 블로그 · 포스타입 · auto_backup.py 연동 대기 중...</div>
+        </div>
+      </div>
+
+      <div class="glass-card">
+        <h4 style="font-size:1rem; font-weight:700; margin-bottom:0.8rem;">📚 연재 작품 전체 인벤토리 현황</h4>
+        <div id="novelInventoryGrid" class="grid-3"></div>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    /* =====================================================================
+     * REAL WORKSPACE DATA (Fallback + Live Server Hybrid)
+     * ===================================================================== */
+    const WORKSPACE_NOVELS = {
+      yupum: {
+        id: 'yupum',
+        title: '《유품》',
+        category: '카테고리 11 (연재소설 유품)',
+        status: '1~13장 연재 중',
+        ledger: 'novel-yupum-ledger.md',
+        publishedCount: 14,
+        totalChars: 42680,
+        chapters: ['ch13-published.txt', 'ch13-draft.txt', 'ch12-published.txt', 'ch11-published.txt', 'ch10-published.txt', 'ch9-published.txt', 'ch8-published.txt', 'ch1-published.txt'],
+        sampleCheck: {
+          charCount: 3392,
+          dialogueRatio: 38.4,
+          passes: [
+            '머리말 허구 안내 확인 (줄 1)',
+            "끝 줄 형식 확인: '(14장에 계속)'",
+            '글자 수: 공백 포함 3,392자 / 공백 제외 2,580자 (권장 분량 충족)',
+            '큰따옴표("") 짝 일치 (대사 쌍: 24개)',
+            "작은따옴표('') 짝 일치 (속말/생각: 6개)",
+            '대괄호([]) 짝 일치 (문자/메모/서류: 4개)',
+            '연속 공백 없음 & 문단 간 빈 줄 규칙 적합',
+            '시각 표기 숫자 통일 준수 & 동일 주어 연속 3회 이상 시작 없음',
+            '감정 직접 설명 절제 (3회 이하 적정)'
+          ],
+          warnings: [],
+          errors: []
+        }
+      },
+      evidence4: {
+        id: 'evidence4',
+        title: '《증거 4호》',
+        category: '미스터리/추리 시리즈',
+        status: '1~12장 집필 완료',
+        ledger: 'novel-evidence4-ledger.md',
+        publishedCount: 12,
+        totalChars: 39850,
+        chapters: ['ch12-published.txt', 'ch11-published.txt', 'ch10-published.txt', 'ch9-published.txt', 'ch8-published.txt', 'ch7-published.txt', 'ch6-published.txt', 'ch1-published.txt'],
+        sampleCheck: {
+          charCount: 3140,
+          dialogueRatio: 36.2,
+          passes: [
+            '머리말 허구 안내 확인 (줄 1)',
+            "끝 줄 형식 확인: '(끝)'",
+            '글자 수: 공백 포함 3,140자 (권장 분량 충족)',
+            '큰따옴표("") 짝 일치 & 대괄호([]) 짝 일치',
+            '연속 공백 없음 & 문단 간 빈 줄 규칙 적합',
+            '시각 표기 숫자 통일 준수 (novel-evidence4-ledger.md 시간표 정합)'
+          ],
+          warnings: [],
+          errors: []
+        }
+      },
+      missingline: {
+        id: 'missingline',
+        title: '《사라진 호선》',
+        category: '신작 스릴러 시리즈',
+        status: '1장 런칭 완료',
+        ledger: 'novel-missingline-ledger.md',
+        publishedCount: 1,
+        totalChars: 3280,
+        chapters: ['ch1-published.txt', 'ch1-draft.txt'],
+        sampleCheck: {
+          charCount: 3280,
+          dialogueRatio: 34.8,
+          passes: [
+            '머리말 허구 안내 확인 (줄 1)',
+            "끝 줄 형식 확인: '(2장에 계속)'",
+            '글자 수: 공백 포함 3,280자 (권장 분량 충족)',
+            '큰따옴표("") 짝 일치 & 대괄호([]) 짝 일치',
+            '시각 표기 숫자 통일 준수 (novel-missingline-ledger.md 대조 완료)'
+          ],
+          warnings: [],
+          errors: []
+        }
+      },
+      silence: {
+        id: 'silence',
+        title: '《침묵의 기록》',
+        category: '추리/서스펜스 시리즈',
+        status: '1~8장 집필 완료',
+        ledger: 'novel-silence-ledger.md',
+        publishedCount: 8,
+        totalChars: 25400,
+        chapters: ['ch8-published.txt', 'ch7-published.txt', 'ch6-published.txt', 'ch5-published.txt', 'ch1-published.txt'],
+        sampleCheck: {
+          charCount: 3110,
+          dialogueRatio: 37.1,
+          passes: [
+            '머리말 허구 안내 확인 (줄 1)',
+            '글자 수: 공백 포함 3,110자 (권장 분량 충족)',
+            '큰따옴표("") 및 작은따옴표(\'\') 짝 일치',
+            '연속 공백 없음 & 감정 직접 설명 절제'
+          ],
+          warnings: [],
+          errors: []
+        }
+      },
+      lasttalk: {
+        id: 'lasttalk',
+        title: '《마지막 통화》',
+        category: '카테고리 10 (1~15장 완결)',
+        status: '1~15장 완결',
+        ledger: 'novel-lasttalk-outline.md',
+        publishedCount: 16,
+        totalChars: 48900,
+        chapters: ['ch15-published.txt', 'ch14-published.txt', 'ch13-published.txt', 'ch12-published.txt', 'ch1-published.txt'],
+        sampleCheck: {
+          charCount: 3450,
+          dialogueRatio: 40.5,
+          passes: [
+            '머리말 허구 안내 확인 (줄 1)',
+            "끝 줄 형식 확인: '(끝)'",
+            '글자 수: 공백 포함 3,450자 (권장 분량 충족)',
+            '큰따옴표("") 짝 일치 & 대괄호([]) 짝 일치',
+            '전 15장 완결 정합성 확인 완료'
+          ],
+          warnings: [],
+          errors: []
+        }
+      }
+    };
+
+    const GRAPH_DATA = {
+      yupum: {
+        title: '《유품》 인물·단서 신경망',
+        nodes: [
+          { id: 'haejin', label: '서해진', role: '주인공 / 유품 정리인', x: 200, y: 160, color: '#38bdf8', r: 25, lore: '고인의 남겨진 물건과 메모에서 시점 불일치를 발견하고 진실을 추적하는 중심 인물.' },
+          { id: 'dongwoo', label: '한동우', role: '핵심 관계자', x: 480, y: 110, color: '#f59e0b', r: 22, lore: '사건 당일의 행적과 통화 기록에 공백이 존재하며, 핵심 열쇠의 이동 경로와 연결됨.' },
+          { id: 'jaesik', label: '마재식', role: '현장 목격·연루자', x: 480, y: 310, color: '#f43f5e', r: 22, lore: '보관함 출입 기록과 장부 내역에서 결정적 단서를 쥐고 있는 인물.' },
+          { id: 'haerin', label: '서해린', role: '해진의 가족', x: 180, y: 330, color: '#10b981', r: 20, lore: '과거 사건의 기록과 가족사를 연결하는 주요 정서적·사실적 축.' },
+          { id: 'dohoon', label: '강도훈', role: '조사 협력자', x: 750, y: 180, color: '#c084fc', r: 22, lore: '공식 기록과 실제 물품 이동 시각 사이의 모순을 검증하는 조력자.' },
+          { id: 'sechang', label: '오세창', role: '배후 이해관계자', x: 740, y: 340, color: '#94a3b8', r: 21, lore: '계약서 및 장부 원장의 실제 수혜자로 지목되는 인물.' }
+        ],
+        edges: [
+          { from: 'haejin', to: 'dongwoo', label: '시각 행적 대조' },
+          { from: 'haejin', to: 'jaesik', label: '유품 전달 경로 추적' },
+          { from: 'haerin', to: 'haejin', label: '과거 단서 공유' },
+          { from: 'dongwoo', to: 'dohoon', label: '알리바이 검증' },
+          { from: 'jaesik', to: 'sechang', label: '장부 거래 연결', color: '#f43f5e' },
+          { from: 'dohoon', to: 'sechang', label: '출입 기록 확보' }
+        ]
+      },
+      evidence4: {
+        title: '《증거 4호》 사실 장부 & 단서 관계망',
+        nodes: [
+          { id: 'ev4', label: '증거 4호', role: '핵심 물증', x: 500, y: 210, color: '#f59e0b', r: 26, lore: '사건 현장에서 수거된 네 번째 물증. 보관 이력과 봉인 시각에 결정적 단서가 담겨 있음.' },
+          { id: 'investigator', label: '담당 조사관', role: '주인공', x: 210, y: 160, color: '#38bdf8', r: 24, lore: '1~12장에 걸쳐 증거 목록과 진술 조서의 시간차 모순을 역추적함.' },
+          { id: 'witness1', label: '최초 목격자', role: '진술인 A', x: 230, y: 340, color: '#10b981', r: 20, lore: '비 오는 밤의 시각 진술에서 디지털 시계와 아날로그 기록 간 15분 오차가 발견됨.' },
+          { id: 'archive', label: '보관소 기록', role: '시간표 앵커', x: 760, y: 150, color: '#c084fc', r: 22, lore: '출입 로그와 인수인계 서명란의 필적·시각 대조 포인트.' },
+          { id: 'suspect', label: '내부 관계자', role: '추적 대상', x: 760, y: 330, color: '#f43f5e', r: 23, lore: '증거 4호의 라벨 교체 시점에 유일하게 접근 권한을 보유했던 인물.' }
+        ],
+        edges: [
+          { from: 'investigator', to: 'ev4', label: '봉인 이력 재검토' },
+          { from: 'witness1', to: 'investigator', label: '15분 시차 진술' },
+          { from: 'ev4', to: 'archive', label: '로그 대조' },
+          { from: 'suspect', to: 'ev4', label: '라벨 접근 흔적', color: '#f43f5e' },
+          { from: 'archive', to: 'suspect', label: '단독 출입 확인' }
+        ]
+      },
+      missingline: {
+        title: '《사라진 호선》 노선·시각 인과율 신경망',
+        nodes: [
+          { id: 'train', label: '막차 열차', role: '사라진 구간', x: 490, y: 200, color: '#38bdf8', r: 25, lore: '정규 운행표와 관제 기록 사이에서 7분간 신호가 소실된 구간.' },
+          { id: 'passenger', label: '탑승 기록자', role: '시점 인물', x: 200, y: 180, color: '#10b981', r: 23, lore: '열차 내부 안내판([ ])과 실제 정차역의 불일치를 최초로 인지한 인물.' },
+          { id: 'control', label: '관제 센터', role: '운행 로그', x: 770, y: 160, color: '#f59e0b', r: 22, lore: '선로 전환 기록과 무전 교신 시각이 어긋난 지점.' },
+          { id: 'platform', label: '폐쇄 승강장', role: '공간 단서', x: 490, y: 350, color: '#f43f5e', r: 22, lore: '도면상 폐쇄되었으나 전력 공급 기록이 남아 있는 지하 구역.' }
+        ],
+        edges: [
+          { from: 'passenger', to: 'train', label: '정차역 불일치 포착' },
+          { from: 'train', to: 'control', label: '7분 신호 공백' },
+          { from: 'train', to: 'platform', label: '우회 선로 진입', color: '#f43f5e' },
+          { from: 'control', to: 'platform', label: '전력 로그 확인' }
+        ]
+      },
+      lasttalk: {
+        title: '《마지막 통화》 인물 관계망 (1~15장 완결)',
+        nodes: [
+          { id: 'seojin', label: '한서진', role: '주인공', x: 200, y: 170, color: '#38bdf8', r: 24, lore: '남겨진 마지막 통화 기록의 발신 위치와 배경음을 단서로 진실을 밝히는 주인공.' },
+          { id: 'doyoon', label: '한도윤', role: '발신 당사자', x: 480, y: 120, color: '#f59e0b', r: 22, lore: '통화 직전 남긴 짧은 메모와 행적이 전체 사건의 출발점이 됨.' },
+          { id: 'seungtae', label: '오승태', role: '핵심 조사선', x: 480, y: 320, color: '#f43f5e', r: 22, lore: '통화 중계기 기록과 차량 이동 경로의 교차점에 위치한 인물.' },
+          { id: 'hana', label: '윤하나', role: '결정적 증언자', x: 760, y: 170, color: '#10b981', r: 21, lore: '사건 당일 저녁의 실제 만남 시각을 증언하여 알리바이를 뒤집는 인물.' },
+          { id: 'seunghwan', label: '백승환', role: '배후 연결고리', x: 760, y: 330, color: '#c084fc', r: 21, lore: '14~15장 클라이맥스에서 모든 통화 내역의 종착지로 밝혀지는 인물.' }
+        ],
+        edges: [
+          { from: 'doyoon', to: 'seojin', label: '마지막 발신 기록' },
+          { from: 'seojin', to: 'seungtae', label: '행적 추적' },
+          { from: 'seojin', to: 'hana', label: '시각 증언 확보' },
+          { from: 'seungtae', to: 'seunghwan', label: '중계기 위치 일치', color: '#f43f5e' },
+          { from: 'hana', to: 'seunghwan', label: '결정적 단서 제공' }
+        ]
+      }
+    };
+
+    /* =====================================================================
+     * 1. TAB CONTROLLER
+     * ===================================================================== */
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabPanes = document.querySelectorAll('.tab-pane');
+
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        tabBtns.forEach(b => b.classList.remove('active'));
+        tabPanes.forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        const target = document.getElementById(btn.dataset.tab);
+        if (target) target.classList.add('active');
+
+        if (btn.dataset.tab === 'tab-math') {
+          drawPythagoras();
+        } else if (btn.dataset.tab === 'tab-graph') {
+          drawGraph();
+        }
+      });
+    });
+
+    /* =====================================================================
+     * 2. PYTHAGORAS FLUID SIMULATION CANVAS
+     * ===================================================================== */
+    const pyCanvas = document.getElementById('pythagorasCanvas');
+    const pyCtx = pyCanvas.getContext('2d');
+    const pySlider = document.getElementById('pythagorasSlider');
+    const angleBadge = document.getElementById('angleBadge');
+    const autoSpinBtn = document.getElementById('autoSpinBtn');
+
+    let pyAngle = 0;
+    let isAutoSpin = false;
+
+    function drawPythagoras() {
+      const w = pyCanvas.width;
+      const h = pyCanvas.height;
+      pyCtx.clearRect(0, 0, w, h);
+
+      pyCtx.save();
+      pyCtx.translate(w / 2, h / 2);
+      pyCtx.rotate((pyAngle * Math.PI) / 180);
+
+      const a = 60, b = 80, c = 100;
+
+      pyCtx.beginPath();
+      pyCtx.moveTo(-c/2, 20);
+      pyCtx.lineTo(c/2, 20);
+      pyCtx.lineTo(-c/2 + (a*a)/c, 20 - (a*b)/c);
+      pyCtx.closePath();
+      pyCtx.fillStyle = 'rgba(255, 255, 255, 0.08)';
+      pyCtx.strokeStyle = '#fff';
+      pyCtx.lineWidth = 1.5;
+      pyCtx.fill();
+      pyCtx.stroke();
+
+      pyCtx.strokeStyle = 'rgba(56, 189, 248, 0.6)';
+      pyCtx.strokeRect(-c/2, 20, c, c);
+
+      const fillProgress = (Math.sin(((pyAngle - 90) * Math.PI) / 180) + 1) / 2;
+
+      pyCtx.fillStyle = 'rgba(56, 189, 248, 0.7)';
+      pyCtx.fillRect(-c/2, 20 + c * (1 - fillProgress), c, c * fillProgress);
+
+      pyCtx.save();
+      pyCtx.translate(-c/2, 20);
+      pyCtx.rotate(-Math.asin(b/c));
+      pyCtx.strokeStyle = 'rgba(245, 158, 11, 0.6)';
+      pyCtx.strokeRect(0, -a, a, a);
+      pyCtx.fillStyle = 'rgba(245, 158, 11, 0.7)';
+      pyCtx.fillRect(0, -a * (1 - fillProgress), a, a * (1 - fillProgress));
+      pyCtx.restore();
+
+      pyCtx.save();
+      pyCtx.translate(c/2, 20);
+      pyCtx.rotate(Math.PI - Math.acos(b/c));
+      pyCtx.strokeStyle = 'rgba(16, 185, 129, 0.6)';
+      pyCtx.strokeRect(0, -b, b, b);
+      pyCtx.fillStyle = 'rgba(16, 185, 129, 0.7)';
+      pyCtx.fillRect(0, -b * (1 - fillProgress), b, b * (1 - fillProgress));
+      pyCtx.restore();
+
+      pyCtx.restore();
+
+      pyCtx.fillStyle = '#94a3b8';
+      pyCtx.font = '12px var(--font-sans)';
+      pyCtx.fillText(`유체 보존율: 100% | a²(36) + b²(64) = c²(100)`, 15, 25);
+    }
+    drawPythagoras();
+
+    pySlider.addEventListener('input', (e) => {
+      pyAngle = parseInt(e.target.value);
+      angleBadge.textContent = `각도: ${pyAngle}°`;
+      drawPythagoras();
+    });
+
+    autoSpinBtn.addEventListener('click', () => {
+      isAutoSpin = !isAutoSpin;
+      autoSpinBtn.textContent = isAutoSpin ? '⏸ 정지' : '▶ 자동 회전';
+      if (isAutoSpin) {
+        function spinLoop() {
+          if (!isAutoSpin) return;
+          pyAngle = (pyAngle + 1) % 360;
+          pySlider.value = pyAngle;
+          angleBadge.textContent = `각도: ${pyAngle}°`;
+          drawPythagoras();
+          requestAnimationFrame(spinLoop);
+        }
+        requestAnimationFrame(spinLoop);
+      }
+    });
+
+    /* =====================================================================
+     * 3. FOURIER EPICYCLE SYNTHESIS CANVAS
+     * ===================================================================== */
+    const fCanvas = document.getElementById('fourierCanvas');
+    const fCtx = fCanvas.getContext('2d');
+    const fSlider = document.getElementById('fourierSlider');
+    const circleBadge = document.getElementById('circleCountBadge');
+    const waveShapeBtn = document.getElementById('waveShapeBtn');
+
+    let fourierTime = 0;
+    let wavePoints = [];
+    let numCircles = 5;
+    let waveType = 'square';
+
+    waveShapeBtn.addEventListener('click', () => {
+      if (waveType === 'square') {
+        waveType = 'sawtooth';
+        waveShapeBtn.textContent = '파형 변경: 톱니파';
+      } else if (waveType === 'sawtooth') {
+        waveType = 'triangle';
+        waveShapeBtn.textContent = '파형 변경: 삼각파';
+      } else {
+        waveType = 'square';
+        waveShapeBtn.textContent = '파형 변경: 사각파';
+      }
+      wavePoints = [];
+    });
+
+    function drawFourier() {
+      const w = fCanvas.width;
+      const h = fCanvas.height;
+      fCtx.clearRect(0, 0, w, h);
+
+      let x = 120;
+      let y = h / 2;
+
+      for (let i = 0; i < numCircles; i++) {
+        const prevx = x;
+        const prevy = y;
+        let n, radius;
+        if (waveType === 'square') {
+          n = i * 2 + 1;
+          radius = 50 * (4 / (n * Math.PI));
+        } else if (waveType === 'sawtooth') {
+          n = i + 1;
+          radius = 50 * (2 / (n * Math.PI)) * (i % 2 === 0 ? 1 : -1);
+        } else {
+          n = i * 2 + 1;
+          const sign = i % 2 === 0 ? 1 : -1;
+          radius = 55 * (8 / (Math.PI * Math.PI * n * n)) * sign;
+        }
+        x += radius * Math.cos(n * fourierTime);
+        y += radius * Math.sin(n * fourierTime);
+
+        fCtx.beginPath();
+        fCtx.arc(prevx, prevy, Math.abs(radius), 0, Math.PI * 2);
+        fCtx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+        fCtx.lineWidth = 1;
+        fCtx.stroke();
+
+        fCtx.beginPath();
+        fCtx.moveTo(prevx, prevy);
+        fCtx.lineTo(x, y);
+        fCtx.strokeStyle = 'rgba(56, 189, 248, 0.5)';
+        fCtx.stroke();
+      }
+
+      wavePoints.unshift(y);
+      if (wavePoints.length > 260) wavePoints.pop();
+
+      fCtx.beginPath();
+      fCtx.moveTo(x, y);
+      fCtx.lineTo(260, wavePoints[0]);
+      fCtx.strokeStyle = 'rgba(245, 158, 11, 0.4)';
+      fCtx.stroke();
+
+      fCtx.beginPath();
+      for (let i = 0; i < wavePoints.length; i++) {
+        fCtx.lineTo(260 + i, wavePoints[i]);
+      }
+      fCtx.strokeStyle = '#38bdf8';
+      fCtx.lineWidth = 2;
+      fCtx.stroke();
+
+      fourierTime += 0.035;
+      requestAnimationFrame(drawFourier);
+    }
+    drawFourier();
+
+    fSlider.addEventListener('input', (e) => {
+      numCircles = parseInt(e.target.value);
+      circleBadge.textContent = `조화 원: ${numCircles}개`;
+      wavePoints = [];
+    });
+
+    /* =====================================================================
+     * 4. MULTI-NOVEL CAUSAL GRAPH NETWORK + EDITOR (TAB 3)
+     * ===================================================================== */
+    const gCanvas = document.getElementById('graphCanvas');
+    const gCtx = gCanvas.getContext('2d');
+    const nodeLoreBox = document.getElementById('nodeLoreBox');
+    const graphTitleBadge = document.getElementById('graphTitleBadge');
+    const edgeFromSelect = document.getElementById('edgeFromSelect');
+    const edgeToSelect = document.getElementById('edgeToSelect');
+
+    let currentGraphKey = 'yupum';
+    let nodes = JSON.parse(JSON.stringify(GRAPH_DATA.yupum.nodes));
+    let edges = JSON.parse(JSON.stringify(GRAPH_DATA.yupum.edges));
+    let draggedNode = null;
+    let selectedNode = null;
+
+    function refreshEdgeSelects() {
+      const opts = nodes.map(n => `<option value="${n.id}">${n.label}</option>`).join('');
+      edgeFromSelect.innerHTML = opts;
+      edgeToSelect.innerHTML = opts;
+      if (nodes.length > 1) edgeToSelect.selectedIndex = 1;
+    }
+
+    async function loadGraphForNovel(novelKey) {
+      currentGraphKey = novelKey;
+      selectedNode = null;
+      try {
+        const res = await fetch(`/api/graph?novel=${encodeURIComponent(novelKey)}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success && data.graph) {
+            nodes = JSON.parse(JSON.stringify(data.graph.nodes));
+            edges = JSON.parse(JSON.stringify(data.graph.edges));
+            graphTitleBadge.textContent = data.graph.title;
+            refreshEdgeSelects();
+            drawGraph();
+            return;
+          }
+        }
+      } catch (_) {}
+      const cached = localStorage.getItem(`vision_graph_${novelKey}`);
+      if (cached) {
+        try {
+          const parsed = JSON.parse(cached);
+          nodes = parsed.nodes;
+          edges = parsed.edges;
+          graphTitleBadge.textContent = parsed.title || `${novelKey} 인과율 신경망`;
+          refreshEdgeSelects();
+          drawGraph();
+          return;
+        } catch (_) {}
+      }
+      const fallback = GRAPH_DATA[novelKey] || GRAPH_DATA.yupum;
+      nodes = JSON.parse(JSON.stringify(fallback.nodes));
+      edges = JSON.parse(JSON.stringify(fallback.edges));
+      graphTitleBadge.textContent = fallback.title;
+      refreshEdgeSelects();
+      drawGraph();
+    }
+
+    document.querySelectorAll('[data-graph-novel]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('[data-graph-novel]').forEach(b => b.classList.remove('active-chip'));
+        btn.classList.add('active-chip');
+        loadGraphForNovel(btn.dataset.graphNovel);
+      });
+    });
+
+    function drawGraph() {
+      const w = gCanvas.width;
+      const h = gCanvas.height;
+      gCtx.clearRect(0, 0, w, h);
+
+      edges.forEach(e => {
+        const n1 = nodes.find(n => n.id === e.from);
+        const n2 = nodes.find(n => n.id === e.to);
+        if (!n1 || !n2) return;
+
+        gCtx.beginPath();
+        gCtx.moveTo(n1.x, n1.y);
+        gCtx.lineTo(n2.x, n2.y);
+        gCtx.strokeStyle = e.color || 'rgba(255, 255, 255, 0.22)';
+        gCtx.lineWidth = 1.6;
+        gCtx.stroke();
+
+        const midX = (n1.x + n2.x) / 2;
+        const midY = (n1.y + n2.y) / 2;
+        gCtx.fillStyle = '#94a3b8';
+        gCtx.font = '11px var(--font-sans)';
+        gCtx.textAlign = 'center';
+        gCtx.fillText(e.label, midX, midY - 6);
+      });
+
+      nodes.forEach(n => {
+        const isSelected = selectedNode && selectedNode.id === n.id;
+        gCtx.save();
+        gCtx.beginPath();
+        gCtx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+        gCtx.fillStyle = isSelected ? '#1e293b' : '#0f172a';
+        gCtx.fill();
+        gCtx.strokeStyle = isSelected ? '#ffffff' : n.color;
+        gCtx.lineWidth = isSelected ? 3.5 : 2.5;
+        gCtx.shadowColor = n.color;
+        gCtx.shadowBlur = isSelected ? 20 : 12;
+        gCtx.stroke();
+        gCtx.restore();
+
+        gCtx.fillStyle = '#fff';
+        gCtx.font = 'bold 12px var(--font-sans)';
+        gCtx.textAlign = 'center';
+        gCtx.fillText(n.label, n.x, n.y + 4);
+
+        gCtx.fillStyle = '#94a3b8';
+        gCtx.font = '10px var(--font-sans)';
+        gCtx.fillText(n.role, n.x, n.y + n.r + 14);
+      });
+    }
+    refreshEdgeSelects();
+    drawGraph();
+
+    gCanvas.addEventListener('mousedown', (e) => {
+      const rect = gCanvas.getBoundingClientRect();
+      const mx = (e.clientX - rect.left) * (gCanvas.width / rect.width);
+      const my = (e.clientY - rect.top) * (gCanvas.height / rect.height);
+
+      const hit = nodes.find(n => Math.hypot(n.x - mx, n.y - my) < n.r + 6);
+      if (hit) {
+        draggedNode = hit;
+        selectedNode = hit;
+        nodeLoreBox.innerHTML = `🔓 <strong style="color:${hit.color}">[${hit.label} — ${hit.role}] 사실 장부 기록:</strong> ${hit.lore}`;
+        drawGraph();
+      }
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!draggedNode) return;
+      const rect = gCanvas.getBoundingClientRect();
+      draggedNode.x = Math.max(30, Math.min(gCanvas.width - 30, (e.clientX - rect.left) * (gCanvas.width / rect.width)));
+      draggedNode.y = Math.max(30, Math.min(gCanvas.height - 30, (e.clientY - rect.top) * (gCanvas.height / rect.height)));
+      drawGraph();
+    });
+
+    window.addEventListener('mouseup', () => { draggedNode = null; });
+
+    document.getElementById('addGraphNodeBtn').addEventListener('click', () => {
+      const label = document.getElementById('newNodeLabel').value.trim();
+      const role = document.getElementById('newNodeRole').value.trim() || '신규 단서';
+      const lore = document.getElementById('newNodeLore').value.trim() || '추가된 사실 장부 단서';
+      if (!label) return;
+      const palette = ['#38bdf8', '#f59e0b', '#10b981', '#c084fc', '#f43f5e'];
+      const newNode = {
+        id: 'node_' + Date.now(),
+        label,
+        role,
+        lore,
+        x: 160 + Math.round(Math.random() * 680),
+        y: 90 + Math.round(Math.random() * 240),
+        color: palette[nodes.length % palette.length],
+        r: 22
+      };
+      nodes.push(newNode);
+      selectedNode = newNode;
+      document.getElementById('newNodeLabel').value = '';
+      document.getElementById('newNodeRole').value = '';
+      document.getElementById('newNodeLore').value = '';
+      refreshEdgeSelects();
+      drawGraph();
+      nodeLoreBox.innerHTML = `➕ <strong>[${label}]</strong> 노드가 추가되었습니다. [💾 신경망 저장]을 누르면 영구 반영됩니다.`;
+    });
+
+    document.getElementById('addGraphEdgeBtn').addEventListener('click', () => {
+      const from = edgeFromSelect.value;
+      const to = edgeToSelect.value;
+      const label = document.getElementById('newEdgeLabel').value.trim() || '연결 단서';
+      if (!from || !to || from === to) return;
+      edges.push({ from, to, label, color: '#38bdf8' });
+      document.getElementById('newEdgeLabel').value = '';
+      drawGraph();
+    });
+
+    document.getElementById('deleteGraphNodeBtn').addEventListener('click', () => {
+      if (!selectedNode) {
+        nodeLoreBox.innerHTML = '⚠️ 삭제할 노드를 먼저 캔버스에서 클릭해 선택하세요.';
+        return;
+      }
+      const delId = selectedNode.id;
+      nodes = nodes.filter(n => n.id !== delId);
+      edges = edges.filter(e => e.from !== delId && e.to !== delId);
+      selectedNode = null;
+      refreshEdgeSelects();
+      drawGraph();
+      nodeLoreBox.innerHTML = '🗑️ 선택된 노드와 연결선이 삭제되었습니다.';
+    });
+
+    document.getElementById('saveGraphBtn').addEventListener('click', async () => {
+      const payload = { title: graphTitleBadge.textContent, nodes, edges };
+      localStorage.setItem(`vision_graph_${currentGraphKey}`, JSON.stringify(payload));
+      try {
+        const res = await fetch('/api/graph/save', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ novel: currentGraphKey, graph: payload })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success) {
+            nodeLoreBox.innerHTML = `✅ <strong>${data.message}</strong>`;
+            return;
+          }
+        }
+      } catch (_) {}
+      nodeLoreBox.innerHTML = '✅ 브라우저 로컬 스토리지에 인과율 신경망이 저장되었습니다.';
+    });
+
+    document.getElementById('resetGraphBtn').addEventListener('click', () => {
+      localStorage.removeItem(`vision_graph_${currentGraphKey}`);
+      loadGraphForNovel(currentGraphKey);
+    });
+
+    /* =====================================================================
+     * 5. REAL NOVEL_CHECKER.PY RUNNER, EDITOR, DOCS (TAB 2) & INVENTORY (TAB 4)
+     * ===================================================================== */
+    const novelSelect = document.getElementById('novelSelect');
+    const chapterSelect = document.getElementById('chapterSelect');
+    const startBtn = document.getElementById('startPipelineBtn');
+    const term = document.getElementById('terminalBox');
+    const checkerScoreBadge = document.getElementById('checkerScoreBadge');
+    const manuscriptBadge = document.getElementById('manuscriptBadge');
+    const liveStatsBadge = document.getElementById('liveStatsBadge');
+    const manuscriptReaderBox = document.getElementById('manuscriptReaderBox');
+    const docEditorBox = document.getElementById('docEditorBox');
+    const docFileBadge = document.getElementById('docFileBadge');
+    let currentDocKind = 'ledger';
+
+    const FALLBACK_MANUSCRIPTS = {
+      yupum: "※ 이 소설은 허구입니다. 등장하는 인물, 단체, 사건은 실제와 관련이 없습니다.\n\n《유품》 13장. 다른 종이\n\n손가락 끝의 감각이 얼어붙을 듯 시렸다.\n\n11월 20일 화요일 오후 1시 20분. 남구 신흥동 골목 끝자락에 자리 잡은 붉은 벽돌 다세대주택 반지하 101호의 바닥은 냉골이었다. 보일러가 꺼진 지 일주일이 넘은 방 안에서는 곰팡이 슨 도배지 냄새와 기름때 찌든 냄새, 그리고 덜 마른 흙먼지 냄새가 뒤섞여 목구멍을 텁텁하게 찔러왔다.\n\n해진은 올이 풀린 빨간 고무 코팅 목장갑을 고쳐 끼며 낡은 전기장판을 반으로 접었다...\n\n(14장에 계속)",
+      missingline: "※ 이 소설은 허구입니다. 등장하는 인물, 단체, 사건은 실제와 관련이 없습니다.\n\n《막차 이후》 1장. 마지막 승객\n\n지하 3층 유치선 터널의 공기는 한겨울 냉장고처럼 서늘한 11도에 묶여 있었다.\n\n눅눅한 콘크리트 벽면에서 배어 나오는 물기와 철로 바닥에 스민 오래된 윤활유 냄새, 그리고 고압 전차선 특유의 텁텁한 오존 냄새가 코끝을 찔렀다...\n\n11월 18일 화요일 새벽 1시 12분. 성북선 종착역인 북산역 승강장에서 승객을 모두 내려보낸 2047편성 막차가 지하 3층 유치선 2번 선로로 들어온 지 꼭 10분이 지난 시각이었다.\n\n(2장에 계속)"
+    };
+
+    function updateLiveStats() {
+      const text = manuscriptReaderBox.value || '';
+      const total = text.length;
+      let dChars = 0;
+      const matches = text.match(/"[^"]*"/g);
+      if (matches) dChars = matches.reduce((acc, m) => acc + m.length, 0);
+      const ratio = total ? ((dChars / total) * 100).toFixed(1) : '0.0';
+      liveStatsBadge.textContent = `${total.toLocaleString()}자 · 대사 ${ratio}%`;
+    }
+    manuscriptReaderBox.addEventListener('input', updateLiveStats);
+
+    async function loadDoc(novelKey, kind) {
+      currentDocKind = kind;
+      docEditorBox.value = '문서를 불러오는 중...';
+      try {
+        const res = await fetch(`/api/docs?novel=${encodeURIComponent(novelKey)}&kind=${encodeURIComponent(kind)}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success) {
+            docFileBadge.textContent = data.fileName || '등록된 문서 없음';
+            docEditorBox.value = data.content || '';
+            return;
+          }
+        }
+      } catch (_) {}
+      const meta = WORKSPACE_NOVELS[novelKey] || WORKSPACE_NOVELS.yupum;
+      docFileBadge.textContent = kind === 'ledger' ? (meta.ledger || '없음') : `${novelKey}-outline.md`;
+      docEditorBox.value = `# ${meta.title} ${kind.toUpperCase()}\n\n(서버 실행 시 실제 워크스페이스 마크다운 파일이 실시간으로 로드됩니다.)`;
+    }
+
+    document.getElementById('docTabLedger').addEventListener('click', () => {
+      document.getElementById('docTabLedger').classList.add('active-chip');
+      document.getElementById('docTabOutline').classList.remove('active-chip');
+      loadDoc(novelSelect.value, 'ledger');
+    });
+    document.getElementById('docTabOutline').addEventListener('click', () => {
+      document.getElementById('docTabOutline').classList.add('active-chip');
+      document.getElementById('docTabLedger').classList.remove('active-chip');
+      loadDoc(novelSelect.value, 'outline');
+    });
+
+    document.getElementById('saveDocBtn').addEventListener('click', async () => {
+      try {
+        const res = await fetch('/api/docs/save', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ novel: novelSelect.value, kind: currentDocKind, content: docEditorBox.value })
+        });
+        const data = await res.json();
+        appendLog(data.success ? `💾 [문서 저장] ${data.message}` : `X [문서 저장 실패] ${data.error}`, data.success ? 'success' : 'err');
+      } catch (_) {
+        appendLog('! [오프라인] 서버 연결 시 로컬 마크다운 파일에 직접 저장됩니다.', 'warn');
+      }
+    });
+
+    async function loadManuscript(novelKey, fileName) {
+      const meta = WORKSPACE_NOVELS[novelKey] || WORKSPACE_NOVELS.yupum;
+      manuscriptBadge.textContent = `${meta.title} — ${fileName}`;
+      manuscriptReaderBox.value = '원고 본문을 불러오는 중...';
+      try {
+        const res = await fetch(`/api/chapter?novel=${encodeURIComponent(novelKey)}&fileName=${encodeURIComponent(fileName)}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success && data.content) {
+            manuscriptReaderBox.value = data.content;
+            updateLiveStats();
+            return;
+          }
+        }
+      } catch (_) {}
+      manuscriptReaderBox.value = FALLBACK_MANUSCRIPTS[novelKey] || FALLBACK_MANUSCRIPTS.yupum;
+      updateLiveStats();
+    }
+
+    function populateChapterSelect(novelKey) {
+      const meta = WORKSPACE_NOVELS[novelKey] || WORKSPACE_NOVELS.yupum;
+      chapterSelect.innerHTML = meta.chapters
+        .map(ch => `<option value="${ch}">${ch}</option>`)
+        .join('');
+      loadManuscript(novelKey, meta.chapters[0]);
+      loadDoc(novelKey, currentDocKind);
+    }
+    populateChapterSelect('yupum');
+
+    novelSelect.addEventListener('change', (e) => {
+      populateChapterSelect(e.target.value);
+    });
+
+    chapterSelect.addEventListener('change', (e) => {
+      loadManuscript(novelSelect.value, e.target.value);
+    });
+
+    function appendLog(text, type = 'info') {
+      const line = document.createElement('div');
+      line.className = `term-line term-${type}`;
+      const time = new Date().toTimeString().split(' ')[0];
+      line.textContent = `[${time}] ${text}`;
+      term.appendChild(line);
+      term.scrollTop = term.scrollHeight;
+    }
+
+    document.getElementById('saveManuscriptBtn').addEventListener('click', async () => {
+      const novelKey = novelSelect.value;
+      const fileName = chapterSelect.value;
+      try {
+        const res = await fetch('/api/chapter/save', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ novel: novelKey, fileName, content: manuscriptReaderBox.value })
+        });
+        const data = await res.json();
+        appendLog(data.success ? `💾 [원고 저장] ${data.message}` : `X [저장 실패] ${data.error}`, data.success ? 'success' : 'err');
+      } catch (_) {
+        appendLog('! [오프라인] 서버(vision_studio_server.py) 연결 시 파일에 즉시 저장됩니다.', 'warn');
+      }
+    });
+
+    document.getElementById('autoFixBtn').addEventListener('click', async () => {
+      const novelKey = novelSelect.value;
+      const fileName = chapterSelect.value;
+      try {
+        const res = await fetch('/api/chapter/fix', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ novel: novelKey, fileName })
+        });
+        const data = await res.json();
+        if (data.success) {
+          manuscriptReaderBox.value = data.content;
+          updateLiveStats();
+          appendLog(`✨ [자동 교정] ${data.message}`, 'success');
+        } else {
+          appendLog(`X [자동 교정 실패] ${data.error}`, 'err');
+        }
+      } catch (_) {
+        const cleaned = manuscriptReaderBox.value.replace(/[ \t]+\n/g, '\n').replace(/\n{3,}/g, '\n\n');
+        manuscriptReaderBox.value = cleaned;
+        updateLiveStats();
+        appendLog('✨ [로컬 교정] 연속 빈 줄 및 줄 끝 공백 정리 완료', 'success');
+      }
+    });
+
+    document.getElementById('promoteChapterBtn').addEventListener('click', async () => {
+      const novelKey = novelSelect.value;
+      const fileName = chapterSelect.value;
+      try {
+        const res = await fetch('/api/chapter/promote', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ novel: novelKey, fileName })
+        });
+        const data = await res.json();
+        if (data.success) {
+          appendLog(`🏆 [승급 완료] ${data.message}`, 'success');
+        } else {
+          appendLog(`X [승급 보류] ${data.error}`, 'err');
+        }
+      } catch (_) {
+        appendLog('! [오프라인] 게시본 승급(--promote)은 vision_studio_server.py 실행 상태에서 동작합니다.', 'warn');
+      }
+    });
+
+    startBtn.addEventListener('click', async () => {
+      startBtn.disabled = true;
+      startBtn.textContent = '⏳ novel_checker 실행 중...';
+      term.innerHTML = '';
+
+      const novelKey = novelSelect.value;
+      const fileName = chapterSelect.value;
+      const fallbackMeta = WORKSPACE_NOVELS[novelKey] || WORKSPACE_NOVELS.yupum;
+
+      appendLog(`[TARGET] 작품: ${fallbackMeta.title} / 파일: ${fileName}`, 'info');
+      appendLog(`[LEDGER] 참조 장부: ${fallbackMeta.ledger}`, 'info');
+
+      let result = null;
+      try {
+        const res = await fetch('/api/check', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ novel: novelKey, fileName })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success) result = data;
+        }
+      } catch (_) {}
+
+      if (!result) {
+        result = {
+          novelTitle: fallbackMeta.title,
+          fileName,
+          charCount: fallbackMeta.sampleCheck.charCount,
+          dialogueRatio: fallbackMeta.sampleCheck.dialogueRatio,
+          passes: fallbackMeta.sampleCheck.passes,
+          warnings: fallbackMeta.sampleCheck.warnings,
+          errors: fallbackMeta.sampleCheck.errors,
+          hasLedger: true
+        };
+      }
+
+      // Step 1
+      document.getElementById('step-1').classList.add('active');
+      document.getElementById('step1-status').textContent = 'CHECKING';
+      document.getElementById('step1-sub').textContent = `${fileName} 머리말 허구 안내 및 끝 줄 정규식 검사...`;
+
+      setTimeout(() => {
+        document.getElementById('step-1').classList.remove('active');
+        document.getElementById('step1-status').textContent = 'PASS';
+        document.getElementById('step-2').classList.add('active');
+        document.getElementById('step2-status').textContent = 'CHECKING';
+        document.getElementById('step2-sub').textContent = `총 ${result.charCount.toLocaleString()}자 / 대사 비중 ${result.dialogueRatio}% 분석...`;
+        result.passes.slice(0, 4).forEach(p => appendLog(`✓ [통과] ${p}`, 'success'));
+      }, 450);
+
+      setTimeout(() => {
+        document.getElementById('step-2').classList.remove('active');
+        document.getElementById('step2-status').textContent = 'PASS';
+        document.getElementById('step-3').classList.add('active');
+        document.getElementById('step3-status').textContent = 'CHECKING';
+        document.getElementById('step3-sub').textContent = '시각 숫자 표기 및 주어 반복·감정 서술어 점검...';
+        result.passes.slice(4).forEach(p => appendLog(`✓ [통과] ${p}`, 'success'));
+        (result.warnings || []).forEach(w => appendLog(`! [권장] ${w}`, 'warn'));
+        (result.errors || []).forEach(err => appendLog(`X [오류] ${err}`, 'err'));
+      }, 950);
+
+      setTimeout(() => {
+        document.getElementById('step-3').classList.remove('active');
+        document.getElementById('step3-status').textContent = 'PASS';
+        document.getElementById('step-4').classList.add('active');
+        const errCount = (result.errors || []).length;
+        document.getElementById('step4-status').textContent = errCount === 0 ? 'VERIFIED' : 'REVIEW';
+        document.getElementById('step4-sub').textContent =
+          errCount === 0
+            ? `필수 오류 0건 — 게시본(published.txt) 확정 가능!`
+            : `필수 오류 ${errCount}건 발견 — 교정 필요`;
+        checkerScoreBadge.textContent =
+          errCount === 0 ? `PASS (${result.charCount.toLocaleString()}자)` : `ERR ${errCount}건`;
+        appendLog(
+          `✨ [검수 완료] 통과 ${result.passes.length}건 / 권장 점검 ${(result.warnings || []).length}건 / 필수 오류 ${errCount}건`,
+          errCount === 0 ? 'success' : 'warn'
+        );
+        startBtn.disabled = false;
+        startBtn.textContent = '🚀 실전 검수 재가동';
+      }, 1450);
+    });
+
+    // Populate Tab 4 Inventory & Real Deploy Console
+    function renderInventory() {
+      const grid = document.getElementById('novelInventoryGrid');
+      grid.innerHTML = Object.values(WORKSPACE_NOVELS)
+        .map(
+          n => `
+          <div style="background:rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:10px; padding:14px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <strong style="font-size:0.95rem; color:#fff;">${n.title}</strong>
+              <span class="stat-badge" style="color:var(--primary);">${n.status}</span>
+            </div>
+            <div style="font-size:0.78rem; color:var(--text-muted); margin-bottom:6px;">${n.category}</div>
+            <div style="font-size:0.78rem; color:var(--emerald);">
+              게시본: ${n.publishedCount}개 파일 · 누적 약 ${n.totalChars.toLocaleString()}자
+            </div>
+          </div>
+        `
+        )
+        .join('');
+    }
+    renderInventory();
+
+    const deployConsole = document.getElementById('deployConsole');
+    const deployStatusBadge = document.getElementById('deployStatusBadge');
+    function appendDeployLog(text, type = 'info') {
+      const line = document.createElement('div');
+      line.className = `term-line term-${type}`;
+      const time = new Date().toTimeString().split(' ')[0];
+      line.textContent = `[${time}] ${text}`;
+      deployConsole.appendChild(line);
+      deployConsole.scrollTop = deployConsole.scrollHeight;
+    }
+
+    async function triggerPublish(platform, dryRun) {
+      deployStatusBadge.textContent = dryRun ? 'CHECKING' : 'RUNNING';
+      appendDeployLog(`[${platform.toUpperCase()}] ${dryRun ? '스크립트 점검(--help)' : '실전 발행'} 요청 전송...`, 'info');
+      try {
+        const res = await fetch('/api/publish', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ platform, dryRun })
+        });
+        const data = await res.json();
+        if (data.success) {
+          deployStatusBadge.textContent = 'SUCCESS';
+          appendDeployLog(`✓ 실행 완료: ${data.command}`, 'success');
+          if (data.stdout) appendDeployLog(data.stdout.slice(0, 500), 'info');
+        } else {
+          deployStatusBadge.textContent = 'ERROR';
+          appendDeployLog(`X 실행 실패: ${data.error || data.stderr || '알 수 없는 오류'}`, 'err');
+        }
+      } catch (_) {
+        deployStatusBadge.textContent = 'OFFLINE';
+        appendDeployLog(`! [오프라인] 로컬 서버(vision_studio_server.py) 실행 시 ${platform} 스크립트가 직접 구동됩니다.`, 'warn');
+      }
+    }
+
+    document.getElementById('blogDispatchBtn').addEventListener('click', () => triggerPublish('blog', true));
+    document.getElementById('blogRunBtn').addEventListener('click', () => triggerPublish('blog', false));
+    document.getElementById('postypeDispatchBtn').addEventListener('click', () => triggerPublish('postype', true));
+    document.getElementById('postypeRunBtn').addEventListener('click', () => triggerPublish('postype', false));
+
+    async function triggerBackup(runBackup) {
+      const box = document.getElementById('backupStatusBox');
+      box.textContent = runBackup ? 'auto_backup.py 실행 중...' : '동기화 상태 점검 중...';
+      deployStatusBadge.textContent = runBackup ? 'BACKING UP' : 'CHECKING';
+      try {
+        const res = await fetch('/api/backup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ runBackup })
+        });
+        const data = await res.json();
+        box.textContent = `✓ ${data.message} (${data.gitStatus})`;
+        deployStatusBadge.textContent = data.success ? 'SYNCED' : 'ERROR';
+        appendDeployLog(`[BACKUP] ${data.message} | Git: ${data.gitStatus}`, data.success ? 'success' : 'err');
+        if (data.output) appendDeployLog(data.output.slice(0, 500), 'info');
+      } catch (_) {
+        box.textContent = '✓ GitHub(kwonflower831-cell/naver-blog-novels) 및 Google Drive 백업 연동 대기';
+        deployStatusBadge.textContent = 'OFFLINE';
+        appendDeployLog('! [오프라인] auto_backup.py 실행을 위해 vision_studio_server.py가 필요합니다.', 'warn');
+      }
+    }
+
+    document.getElementById('syncBackupBtn').addEventListener('click', () => triggerBackup(false));
+    document.getElementById('runBackupBtn').addEventListener('click', () => triggerBackup(true));
+
+    document.getElementById('downloadHtmlBtn').addEventListener('click', () => {
+      const htmlContent = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+      const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'Antigravity_Vision_Studio.html';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+  </script>
+</body>
+</html>

@@ -33,10 +33,26 @@ def run_git(cmd):
 
 def main():
     log("=" * 55)
-    log("📚 네이버 블로그 소설 원고 GitHub 자동 백업 도구")
+    log("📚 네이버 블로그 소설 원고 & 비전 스튜디오 GitHub 자동 백업 도구")
     log("=" * 55)
     log(f"📁 작업 경로: {REPO_DIR}")
     log(f"⏰ 실행 시각: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+
+    # 0. Auto-sync Antigravity_Vision_Studio.html between D:\사용자\storyops\vision_studio and REPO_DIR
+    ext_studio_dir = Path(r"D:\사용자\storyops\vision_studio")
+    ext_studio_html = ext_studio_dir / "Antigravity_Vision_Studio.html"
+    repo_studio_html = REPO_DIR / "Antigravity_Vision_Studio.html"
+    try:
+        if repo_studio_html.exists() and ext_studio_dir.exists():
+            import shutil
+            if not ext_studio_html.exists() or repo_studio_html.stat().st_mtime > ext_studio_html.stat().st_mtime:
+                shutil.copy2(repo_studio_html, ext_studio_html)
+                log(f"🔄 최신 비전 스튜디오 HTML을 {ext_studio_html} 경로로 동기화했습니다.")
+            elif ext_studio_html.stat().st_mtime > repo_studio_html.stat().st_mtime:
+                shutil.copy2(ext_studio_html, repo_studio_html)
+                log(f"🔄 {ext_studio_html} 변경본을 Git 저장소 안으로 가져왔습니다.")
+    except Exception:
+        pass
 
     # 1. Check status
     code, out, err = run_git(["status", "--porcelain"])
@@ -60,7 +76,10 @@ def main():
         fname = line[2:].strip().replace('"', '')
         log(f"   - [{status}] {fname}")
         
-        if "novel-yupum" in fname:
+        if "Vision_Studio" in fname or "vision_studio" in fname:
+            if "비전스튜디오" not in tags:
+                tags.append("비전스튜디오")
+        elif "novel-yupum" in fname:
             if "유품" not in tags:
                 tags.append("유품")
         elif "novel-lasttalk" in fname:
