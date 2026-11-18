@@ -1,22 +1,15 @@
-import sqlite3, shutil, os
+import sqlite3
+import glob
 
-for prof in ['Default', 'Profile 1']:
-    cookie_path = rf"C:\Users\kwonf\AppData\Local\Google\Chrome\User Data\{prof}\Network\Cookies"
-    if not os.path.exists(cookie_path):
-        cookie_path = rf"C:\Users\kwonf\AppData\Local\Google\Chrome\User Data\{prof}\Cookies"
-    if os.path.exists(cookie_path):
-        temp_path = rf"C:\Users\kwonf\.gemini\antigravity\scratch\cookies_temp.db"
-        try:
-            shutil.copy2(cookie_path, temp_path)
-            conn = sqlite3.connect(temp_path)
-            cur = conn.cursor()
-            cur.execute("SELECT host_key, name, length(encrypted_value) FROM cookies WHERE host_key LIKE '%naver.com%'")
-            rows = cur.fetchall()
-            print(f"{prof}: found {len(rows)} naver cookies")
-            names = [r[1] for r in rows if 'NID' in r[1]]
-            print(f"{prof} NID cookies:", names)
-            conn.close()
-            if os.path.exists(temp_path):
-                os.remove(temp_path)
-        except Exception as e:
-            print(f"{prof} error:", e)
+for f in glob.glob(r'C:\Users\kwonf\.gemini\antigravity\scratch\chrome-naver-profile\**\Cookies', recursive=True):
+    try:
+        conn = sqlite3.connect(f)
+        c = conn.cursor()
+        c.execute("SELECT host_key, name FROM cookies WHERE host_key LIKE '%naver%'")
+        rows = c.fetchall()
+        print(f"File: {f}")
+        print(f"Total naver cookies: {len(rows)}")
+        nid_cookies = [r[1] for r in rows if 'NID' in r[1]]
+        print(f"NID cookies: {nid_cookies}")
+    except Exception as e:
+        print(f"Error {f}: {e}")
