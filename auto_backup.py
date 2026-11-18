@@ -107,7 +107,7 @@ def main():
         return
 
     log("\n" + "=" * 55)
-    log("🎉 GitHub 비공개 저장소 백업 완료!")
+    log("🎉 GitHub 공개 저장소 백업 완료!")
     log(f"🔗 확인 링크: https://github.com/kwonflower831-cell/naver-blog-novels")
     log(f"⏰ 완료 시각: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     log("=" * 55)
