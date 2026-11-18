@@ -16,6 +16,12 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
 from pathlib import Path
 
+# pythonw.exe 실행 시 None stdout/stderr 크래시 방지 안전장치
+if sys.stdout is None:
+    sys.stdout = open(os.devnull, "w", encoding="utf-8")
+if sys.stderr is None:
+    sys.stderr = open(os.devnull, "w", encoding="utf-8")
+
 try:
     from novel_checker import NovelChecker
     HAS_NOVEL_CHECKER = True
