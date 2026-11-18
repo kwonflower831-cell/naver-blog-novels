@@ -8,11 +8,11 @@ echo ========================================================
 
 if exist "D:\사용자\storyops\vision_studio" (
     copy /Y "%~dp0Antigravity_Vision_Studio.html" "D:\사용자\storyops\vision_studio\Antigravity_Vision_Studio.html" >nul
-    echo [✓] 바탕화면 바로가기 경로(D:\사용자\storyops\vision_studio)에 최신 스튜디오 동기화 완료!
+    echo [✓] 바로가기 경로 D:\사용자\storyops\vision_studio 에 최신 스튜디오 동기화 완료!
 )
 
 start "Antigravity Vision Studio Server" /min python "%~dp0vision_studio_server.py"
-timeout /t 1 /nobreak >nul
+ping 127.0.0.1 -n 2 >nul
 
 if exist "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" (
     start "" "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" --app="http://localhost:8080"
