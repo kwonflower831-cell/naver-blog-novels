@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>가계부 자동 정리 도구</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --text: #1e293b;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --income: #059669;
+      --expense: #dc2626;
+      --radius: 12px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Pretendard", "Malgun Gothic", -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+    .container {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 24px 16px 48px;
+    }
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+    header p {
+      margin: 4px 0 0;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    button, .btn-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    button:hover, .btn-label:hover {
+      background: #f1f5f9;
+    }
+    button.primary {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+    }
+    button.primary:hover {
+      background: var(--primary-hover);
+    }
+    button.danger {
+      color: var(--expense);
+    }
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    }
+    .stat-label {
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .stat-value {
+      font-size: 1.45rem;
+      font-weight: 700;
+    }
+    .stat-value.income { color: var(--income); }
+    .stat-value.expense { color: var(--expense); }
+    .layout {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    @media (max-width: 860px) {
+      .layout { grid-template-columns: 1fr; }
+    }
+    h2 {
+      margin: 0 0 12px;
+      font-size: 1.05rem;
+      font-weight: 700;
+    }
+    .drop-zone {
+      border: 2px dashed #cbd5e1;
+      border-radius: 10px;
+      padding: 18px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-bottom: 14px;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .drop-zone.dragover {
+      border-color: var(--primary);
+      background: #eff6ff;
+      color: var(--primary);
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 10px;
+    }
+    .form-field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .form-field label {
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    input, select {
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-family: inherit;
+      background: #fff;
+    }
+    .bar-row {
+      margin-bottom: 10px;
+    }
+    .bar-head {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.84rem;
+      margin-bottom: 4px;
+    }
+    .bar-track {
+      height: 9px;
+      background: #e2e8f0;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%;
+      background: var(--primary);
+      border-radius: 999px;
+    }
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+    }
+    th, td {
+      padding: 10px 8px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+    }
+    th {
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 0.8rem;
+    }
+    td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 0.76rem;
+      font-weight: 600;
+      background: #f1f5f9;
+      color: #334155;
+    }
+    .amt-income { color: var(--income); font-weight: 600; }
+    .amt-expense { color: var(--expense); font-weight: 600; }
+    .rule-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
+    }
+    .rule-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      font-size: 0.78rem;
+    }
+    .rule-chip button {
+      padding: 0 4px;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+    .empty {
+      text-align: center;
+      color: var(--muted);
+      padding: 28px 12px;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <h1>가계부 자동 정리 도구</h1>
+        <p>CSV 내역을 불러오거나 직접 입력하면 키워드로 자동 분류·집계합니다. (브라우저 로컬 저장)</p>
+      </div>
+      <div class="actions">
+        <button type="button" id="loadSampleBtn">샘플 불러오기</button>
+        <button type="button" id="exportCsvBtn" class="primary">엑셀용 CSV 내보내기</button>
+        <button type="button" id="clearAllBtn" class="danger">전체 초기화</button>
+      </div>
+    </header>
+
+    <section class="summary-grid">
+      <div class="card">
+        <div class="stat-label">총 수입</div>
+        <div class="stat-value income" id="totalIncome">0원</div>
+      </div>
+      <div class="card">
+        <div class="stat-label">총 지출</div>
+        <div class="stat-value expense" id="totalExpense">0원</div>
+      </div>
+      <div class="card">
+        <div class="stat-label">순수익 (잔액)</div>
+        <div class="stat-value" id="netBalance">0원</div>
+      </div>
+      <div class="card">
+        <div class="stat-label">표시된 거래 건수</div>
+        <div class="stat-value" id="txCount">0건</div>
+      </div>
+    </section>
+
+    <section class="layout">
+      <div class="card">
+        <h2>내역 불러오기 & 간편 입력</h2>
+        <div class="drop-zone" id="dropZone">
+          은행·카드사 CSV 파일을 여기에 끌어다 놓거나
+          <label class="btn-label" style="margin-left:6px;">
+            파일 선택
+            <input type="file" id="csvFileInput" accept=".csv,.txt" hidden />
+          </label>
+          <div style="margin-top:6px; font-size:0.78rem;">UTF-8 및 한국어 은행 EUC-KR(CP949) CSV 자동 인식</div>
+        </div>
+
+        <form id="txForm">
+          <div class="form-grid">
+            <div class="form-field">
+              <label for="txDate">날짜</label>
+              <input type="date" id="txDate" required />
+            </div>
+            <div class="form-field">
+              <label for="txType">구분</label>
+              <select id="txType">
+                <option value="expense">지출</option>
+                <option value="income">수입</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label for="txDesc">내용 / 가맹점</label>
+              <input type="text" id="txDesc" placeholder="예: GS칼텍스 주유, 점심 김밥" required />
+            </div>
+            <div class="form-field">
+              <label for="txAmount">금액 (원)</label>
+              <input type="number" id="txAmount" min="1" step="1" placeholder="15000" required />
+            </div>
+            <div class="form-field">
+              <label for="txCategory">카테고리 (비우면 자동)</label>
+              <input type="text" id="txCategory" placeholder="자동 분류" />
+            </div>
+            <div class="form-field" style="justify-content:flex-end;">
+              <button type="submit" class="primary" style="height:36px;">추가</button>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="card">
+        <h2>카테고리별 지출 요약</h2>
+        <div id="categoryChart"></div>
+      </div>
+    </section>
+
+    <section class="card" style="margin-bottom:20px;">
+      <h2>자동 분류 키워드 규칙</h2>
+      <form id="ruleForm" style="display:flex; flex-wrap:wrap; gap:8px;">
+        <input type="text" id="ruleKeyword" placeholder="키워드 (예: 스타벅스)" required />
+        <input type="text" id="ruleCategory" placeholder="카테고리 (예: 식비·카페)" required />
+        <button type="submit">규칙 추가</button>
+        <button type="button" id="reclassifyBtn">전체 내역 재분류</button>
+      </form>
+      <div class="rule-list" id="ruleList"></div>
+    </section>
+
+    <section class="card">
+      <div class="filters">
+        <h2 style="margin:0; margin-right:auto;">거래 내역</h2>
+        <select id="monthFilter"><option value="all">전체 월</option></select>
+        <select id="catFilter"><option value="all">전체 카테고리</option></select>
+        <input type="text" id="searchInput" placeholder="내용 검색..." />
+      </div>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>날짜</th>
+              <th>구분</th>
+              <th>내용</th>
+              <th>카테고리</th>
+              <th class="num">금액</th>
+              <th style="width:60px;">관리</th>
+            </tr>
+          </thead>
+          <tbody id="txBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const STORAGE_TX = "ledger_organizer_tx_v1";
+    const STORAGE_RULES = "ledger_organizer_rules_v1";
+
+    const DEFAULT_RULES = [
+      { keyword: "주유", category: "유류·차량비" },
+      { keyword: "SK에너지", category: "유류·차량비" },
+      { keyword: "GS칼텍스", category: "유류·차량비" },
+      { keyword: "S-OIL", category: "유류·차량비" },
+      { keyword: "정비", category: "유류·차량비" },
+      { keyword: "통행료", category: "유류·차량비" },
+      { keyword: "하이패스", category: "유류·차량비" },
+      { keyword: "마트", category: "식비·생활" },
+      { keyword: "편의점", category: "식비·생활" },
+      { keyword: "CU", category: "식비·생활" },
+      { keyword: "GS25", category: "식비·생활" },
+      { keyword: "식당", category: "식비·생활" },
+      { keyword: "김밥", category: "식비·생활" },
+      { keyword: "커피", category: "식비·카페" },
+      { keyword: "스타벅스", category: "식비·카페" },
+      { keyword: "이디야", category: "식비·카페" },
+      { keyword: "통신", category: "고정비·공과금" },
+      { keyword: "SKT", category: "고정비·공과금" },
+      { keyword: "KT", category: "고정비·공과금" },
+      { keyword: "관리비", category: "고정비·공과금" },
+      { keyword: "보험", category: "고정비·공과금" },
+      { keyword: "월세", category: "고정비·공과금" },
+      { keyword: "병원", category: "의료·건강" },
+      { keyword: "약국", category: "의료·건강" },
+      { keyword: "정산", category: "수입·정산" },
+      { keyword: "급여", category: "수입·정산" },
+      { keyword: "입금", category: "수입·정산" }
+    ];
+
+    let transactions = JSON.parse(localStorage.getItem(STORAGE_TX) || "[]");
+    let rules = JSON.parse(localStorage.getItem(STORAGE_RULES) || "null") || [...DEFAULT_RULES];
+
+    const txDateEl = document.getElementById("txDate");
+    txDateEl.value = new Date().toISOString().slice(0, 10);
+
+    function saveState() {
+      localStorage.setItem(STORAGE_TX, JSON.stringify(transactions));
+      localStorage.setItem(STORAGE_RULES, JSON.stringify(rules));
+    }
+
+    function classify(desc, type) {
+      const lower = (desc || "").toLowerCase();
+      for (const r of rules) {
+        if (lower.includes(r.keyword.toLowerCase())) return r.category;
+      }
+      return type === "income" ? "기타 수입" : "기타 지출";
+    }
+
+    function formatWon(n) {
+      return Number(n || 0).toLocaleString("ko-KR") + "원";
+    }
+
+    function normalizeDate(raw) {
+      const s = String(raw || "").trim().replace(/[.\/]/g, "-");
+      const m = s.match(/(\d{4})-(\d{1,2})-(\d{1,2})/);
+      if (!m) return new Date().toISOString().slice(0, 10);
+      return `${m[1]}-${m[2].padStart(2, "0")}-${m[3].padStart(2, "0")}`;
+    }
+
+    function parseNum(raw) {
+      const cleaned = String(raw || "").replace(/[^0-9.-]/g, "");
+      const num = parseFloat(cleaned);
+      return Number.isFinite(num) ? num : 0;
+    }
+
+    function splitCsvLine(line) {
+      const res = [];
+      let cur = "", inQuotes = false;
+      for (let i = 0; i < line.length; i++) {
+        const ch = line[i];
+        if (ch === '"') {
+          if (inQuotes && line[i + 1] === '"') { cur += '"'; i++; }
+          else inQuotes = !inQuotes;
+        } else if (ch === "," && !inQuotes) {
+          res.push(cur.trim()); cur = "";
+        } else {
+          cur += ch;
+        }
+      }
+      res.push(cur.trim());
+      return res;
+    }
+
+    function importCsvText(text) {
+      const lines = text.replace(/\r\n/g, "\n").replace(/\r/g, "\n").split("\n").filter(l => l.trim());
+      if (lines.length < 2) return alert("불러올 거래 행이 없습니다.");
+
+      const headers = splitCsvLine(lines[0]).map(h => h.replace(/^\uFEFF/, "").toLowerCase());
+      const findIdx = (keys) => headers.findIndex(h => keys.some(k => h.includes(k)));
+
+      let dateIdx = findIdx(["날짜", "일자", "일시", "date"]);
+      let descIdx = findIdx(["내용", "적요", "가맹점", "항목", "desc", "memo"]);
+      let amtIdx = findIdx(["금액", "결제금액", "amount"]);
+      let inIdx = findIdx(["입금", "수입"]);
+      let outIdx = findIdx(["출금", "지출"]);
+      let typeIdx = findIdx(["구분", "유형", "type"]);
+      let catIdx = findIdx(["카테고리", "분류", "category"]);
+
+      if (dateIdx === -1) dateIdx = 0;
+      if (descIdx === -1) descIdx = 1;
+
+      let added = 0;
+      for (let i = 1; i < lines.length; i++) {
+        const cols = splitCsvLine(lines[i]);
+        if (cols.length < 2) continue;
+        const date = normalizeDate(cols[dateIdx]);
+        const desc = cols[descIdx] || "내역 없음";
+
+        let type = "expense";
+        let amount = 0;
+
+        if (inIdx !== -1 || outIdx !== -1) {
+          const inVal = inIdx !== -1 ? Math.abs(parseNum(cols[inIdx])) : 0;
+          const outVal = outIdx !== -1 ? Math.abs(parseNum(cols[outIdx])) : 0;
+          if (inVal > 0) { type = "income"; amount = inVal; }
+          else if (outVal > 0) { type = "expense"; amount = outVal; }
+        } else {
+          const colIdx = amtIdx !== -1 ? amtIdx : 2;
+          const rawAmt = parseNum(cols[colIdx]);
+          if (typeIdx !== -1 && (cols[typeIdx] || "").includes("수입")) type = "income";
+          else if (rawAmt > 0 && typeIdx === -1 && (desc.includes("입금") || desc.includes("정산") || desc.includes("급여"))) type = "income";
+          else if (rawAmt < 0) type = "expense";
+          amount = Math.abs(rawAmt);
+        }
+
+        if (amount <= 0) continue;
+        const category = (catIdx !== -1 && cols[catIdx]) ? cols[catIdx] : classify(desc, type);
+        transactions.push({ id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now() + Math.random()), date, type, desc, category, amount });
+        added++;
+      }
+      saveState();
+      render();
+      alert(`${added}건의 거래를 불러와 자동 분류했습니다.`);
+    }
+
+    function render() {
+      const monthVal = document.getElementById("monthFilter").value;
+      const catVal = document.getElementById("catFilter").value;
+      const query = document.getElementById("searchInput").value.trim().toLowerCase();
+
+      const months = [...new Set(transactions.map(t => t.date.slice(0, 7)))].sort().reverse();
+      const cats = [...new Set(transactions.map(t => t.category))].sort();
+
+      const monthSel = document.getElementById("monthFilter");
+      monthSel.innerHTML = `<option value="all">전체 월</option>` + months.map(m => `<option value="${m}">${m}</option>`).join("");
+      monthSel.value = months.includes(monthVal) ? monthVal : "all";
+
+      const catSel = document.getElementById("catFilter");
+      catSel.innerHTML = `<option value="all">전체 카테고리</option>` + cats.map(c => `<option value="${c}">${c}</option>`).join("");
+      catSel.value = cats.includes(catVal) ? catVal : "all";
+
+      const filtered = transactions
+        .filter(t => (monthSel.value === "all" || t.date.startsWith(monthSel.value)))
+        .filter(t => (catSel.value === "all" || t.category === catSel.value))
+        .filter(t => (!query || t.desc.toLowerCase().includes(query) || t.category.toLowerCase().includes(query)))
+        .sort((a, b) => b.date.localeCompare(a.date));
+
+      let income = 0, expense = 0;
+      const catTotals = {};
+      for (const t of filtered) {
+        if (t.type === "income") income += t.amount;
+        else {
+          expense += t.amount;
+          catTotals[t.category] = (catTotals[t.category] || 0) + t.amount;
+        }
+      }
+
+      document.getElementById("totalIncome").textContent = formatWon(income);
+      document.getElementById("totalExpense").textContent = formatWon(expense);
+      const net = income - expense;
+      const netEl = document.getElementById("netBalance");
+      netEl.textContent = (net >= 0 ? "+" : "") + formatWon(net);
+      netEl.style.color = net >= 0 ? "var(--income)" : "var(--expense)";
+      document.getElementById("txCount").textContent = `${filtered.length}건`;
+
+      const chartEl = document.getElementById("categoryChart");
+      const sortedCats = Object.entries(catTotals).sort((a, b) => b[1] - a[1]);
+      if (sortedCats.length === 0) {
+        chartEl.innerHTML = `<div class="empty">표시할 지출 내역이 없습니다.</div>`;
+      } else {
+        chartEl.innerHTML = sortedCats.map(([cat, amt]) => {
+          const pct = expense > 0 ? Math.round((amt / expense) * 100) : 0;
+          return `
+            <div class="bar-row">
+              <div class="bar-head"><span>${cat}</span><span>${formatWon(amt)} (${pct}%)</span></div>
+              <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
+            </div>
+          `;
+        }).join("");
+      }
+
+      const bodyEl = document.getElementById("txBody");
+      if (filtered.length === 0) {
+        bodyEl.innerHTML = `<tr><td colspan="6" class="empty">거래 내역이 없습니다. CSV 파일을 불러오거나 위에서 직접 추가해 보세요.</td></tr>`;
+      } else {
+        bodyEl.innerHTML = filtered.map(t => `
+          <tr>
+            <td>${t.date}</td>
+            <td>${t.type === "income" ? "수입" : "지출"}</td>
+            <td>${escapeHtml(t.desc)}</td>
+            <td><span class="badge">${escapeHtml(t.category)}</span></td>
+            <td class="num ${t.type === "income" ? "amt-income" : "amt-expense"}">${t.type === "income" ? "+" : "-"}${formatWon(t.amount)}</td>
+            <td><button type="button" onclick="deleteTx('${t.id}')" style="padding:4px 8px; font-size:0.75rem;">삭제</button></td>
+          </tr>
+        `).join("");
+      }
+
+      document.getElementById("ruleList").innerHTML = rules.map((r, idx) => `
+        <span class="rule-chip">
+          <b>${escapeHtml(r.keyword)}</b> → ${escapeHtml(r.category)}
+          <button type="button" onclick="deleteRule(${idx})" title="삭제">×</button>
+        </span>
+      `).join("");
+    }
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m]));
+    }
+
+    window.deleteTx = function(id) {
+      transactions = transactions.filter(t => t.id !== id);
+      saveState();
+      render();
+    };
+
+    window.deleteRule = function(idx) {
+      rules.splice(idx, 1);
+      saveState();
+      render();
+    };
+
+    document.getElementById("txForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const date = document.getElementById("txDate").value;
+      const type = document.getElementById("txType").value;
+      const desc = document.getElementById("txDesc").value.trim();
+      const amount = parseNum(document.getElementById("txAmount").value);
+      const customCat = document.getElementById("txCategory").value.trim();
+      if (!desc || amount <= 0) return;
+      const category = customCat || classify(desc, type);
+      transactions.push({ id: String(Date.now() + Math.random()), date, type, desc, category, amount });
+      saveState();
+      document.getElementById("txDesc").value = "";
+      document.getElementById("txAmount").value = "";
+      document.getElementById("txCategory").value = "";
+      render();
+    });
+
+    document.getElementById("ruleForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const keyword = document.getElementById("ruleKeyword").value.trim();
+      const category = document.getElementById("ruleCategory").value.trim();
+      if (!keyword || !category) return;
+      rules.unshift({ keyword, category });
+      saveState();
+      document.getElementById("ruleKeyword").value = "";
+      document.getElementById("ruleCategory").value = "";
+      render();
+    });
+
+    document.getElementById("reclassifyBtn").addEventListener("click", () => {
+      transactions = transactions.map(t => ({ ...t, category: classify(t.desc, t.type) }));
+      saveState();
+      render();
+    });
+
+    function handleFile(file) {
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const buf = e.target.result;
+        let text = new TextDecoder("utf-8").decode(buf);
+        if (text.includes("\uFFFD")) {
+          text = new TextDecoder("euc-kr").decode(buf);
+        }
+        importCsvText(text);
+      };
+      reader.readAsArrayBuffer(file);
+    }
+
+    document.getElementById("csvFileInput").addEventListener("change", (e) => handleFile(e.target.files[0]));
+    const dropZone = document.getElementById("dropZone");
+    dropZone.addEventListener("dragover", (e) => { e.preventDefault(); dropZone.classList.add("dragover"); });
+    dropZone.addEventListener("dragleave", () => dropZone.classList.remove("dragover"));
+    dropZone.addEventListener("drop", (e) => {
+      e.preventDefault();
+      dropZone.classList.remove("dragover");
+      handleFile(e.dataTransfer.files[0]);
+    });
+
+    document.getElementById("loadSampleBtn").addEventListener("click", () => {
+      const sample = [
+        "날짜,구분,내용,금액",
+        "2026-11-18,수입,운행 정산 입금,145000",
+        "2026-11-18,지출,GS칼텍스 주유소,35000",
+        "2026-11-18,지출,김밥천국 점심,9500",
+        "2026-11-19,지출,CU 편의점 생수,3200",
+        "2026-11-19,지출,SKT 통신요금 자동이체,55000",
+        "2026-11-19,수입,오후 배송 정산 입금,112000"
+      ].join("\n");
+      importCsvText(sample);
+    });
+
+    document.getElementById("exportCsvBtn").addEventListener("click", () => {
+      if (transactions.length === 0) return alert("내보낼 거래가 없습니다.");
+      const rows = [["날짜", "구분", "내용", "카테고리", "금액"]];
+      for (const t of [...transactions].sort((a, b) => a.date.localeCompare(b.date))) {
+        rows.push([t.date, t.type === "income" ? "수입" : "지출", `"${t.desc.replace(/"/g, '""')}"`, t.category, t.amount]);
+      }
+      const csv = "\uFEFF" + rows.map(r => r.join(",")).join("\n");
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `가계부_정리_${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    document.getElementById("clearAllBtn").addEventListener("click", () => {
+      if (!confirm("저장된 모든 거래 내역을 삭제할까요?")) return;
+      transactions = [];
+      saveState();
+      render();
+    });
+
+    ["monthFilter", "catFilter"].forEach(id => document.getElementById(id).addEventListener("change", render));
+    document.getElementById("searchInput").addEventListener("input", render);
+
+    render();
+  </script>
+</body>
+</html>

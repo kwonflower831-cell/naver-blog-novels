@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>다이어트 식단 · 칼로리 관리 프로그램</title>
+  <style>
+    :root {
+      --bg: #f4f7f5;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --primary: #10b981;
+      --primary-dark: #059669;
+      --warn: #f59e0b;
+      --danger: #ef4444;
+      --carb: #3b82f6;
+      --protein: #10b981;
+      --fat: #f59e0b;
+      --radius: 12px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Pretendard", "Malgun Gothic", -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+    .container {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: 24px 16px 48px;
+    }
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    header h1 { margin: 0; font-size: 1.5rem; }
+    header p { margin: 4px 0 0; font-size: 0.9rem; color: var(--muted); }
+    .header-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    button {
+      padding: 9px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    button:hover { background: #f3f4f6; }
+    button.primary {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+    }
+    button.primary:hover { background: var(--primary-dark); }
+    button.danger { color: var(--danger); }
+    input, select {
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-family: inherit;
+      background: #fff;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    }
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+    .stat-label { font-size: 0.82rem; color: var(--muted); margin-bottom: 4px; }
+    .stat-value { font-size: 1.45rem; font-weight: 700; }
+    .progress-track {
+      height: 10px;
+      background: #e5e7eb;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+    .progress-fill { height: 100%; border-radius: 999px; transition: width 0.25s; }
+    .layout {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+    @media (max-width: 880px) { .layout { grid-template-columns: 1fr; } }
+    h2 { margin: 0 0 12px; font-size: 1.05rem; }
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .field { display: flex; flex-direction: column; gap: 4px; }
+    .field label { font-size: 0.76rem; color: var(--muted); font-weight: 600; }
+    .food-list {
+      max-height: 310px;
+      overflow-y: auto;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-top: 10px;
+    }
+    .food-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .food-item:last-child { border-bottom: none; }
+    .food-meta { font-size: 0.78rem; color: var(--muted); }
+    .meal-section { margin-bottom: 14px; }
+    .meal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 10px;
+      background: #f9fafb;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      margin-bottom: 6px;
+    }
+    .log-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 6px;
+      border-bottom: 1px solid #f3f4f6;
+      font-size: 0.86rem;
+    }
+    .water-box {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 8px;
+    }
+    .pill {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: #ecfdf5;
+      color: #047857;
+    }
+    .empty { text-align: center; color: var(--muted); padding: 18px; font-size: 0.86rem; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <h1>다이어트 식단 · 칼로리 관리 프로그램</h1>
+        <p>목표 칼로리 계산, 한국인 맞춤 음식 검색, 자동 식단 추천 및 탄단지 기록</p>
+      </div>
+      <div class="header-actions">
+        <input type="date" id="activeDate" />
+        <button type="button" id="recommendBtn" class="primary">오늘 식단 자동 추천</button>
+        <button type="button" id="exportBtn">기록 CSV 내보내기</button>
+      </div>
+    </header>
+
+    <section class="summary-grid">
+      <div class="card">
+        <div class="stat-label">섭취 칼로리 / 목표</div>
+        <div class="stat-value"><span id="kcalConsumed">0</span> <span style="font-size:0.95rem; color:var(--muted);">/ <span id="kcalTarget">1800</span> kcal</span></div>
+        <div class="progress-track"><div class="progress-fill" id="kcalBar" style="width:0%; background:var(--primary);"></div></div>
+        <div class="food-meta" id="kcalRemainText" style="margin-top:6px;">남은 칼로리: 1,800 kcal</div>
+      </div>
+
+      <div class="card">
+        <div class="stat-label">탄수화물 · 단백질 · 지방</div>
+        <div style="font-size:0.84rem; margin-top:4px;">
+          <div>탄수화물 <b id="carbVal">0</b> / <span id="carbGoal">180</span>g</div>
+          <div class="progress-track" style="height:6px; margin:3px 0 6px;"><div class="progress-fill" id="carbBar" style="width:0%; background:var(--carb);"></div></div>
+          <div>단백질 <b id="protVal">0</b> / <span id="protGoal">135</span>g</div>
+          <div class="progress-track" style="height:6px; margin:3px 0 6px;"><div class="progress-fill" id="protBar" style="width:0%; background:var(--protein);"></div></div>
+          <div>지방 <b id="fatVal">0</b> / <span id="fatGoal">60</span>g</div>
+          <div class="progress-track" style="height:6px; margin-top:3px;"><div class="progress-fill" id="fatBar" style="width:0%; background:var(--fat);"></div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="stat-label">오늘 수분 섭취 & 체중</div>
+        <div class="water-box">
+          <div><b id="waterVal" style="font-size:1.25rem;">0</b> <span class="food-meta">ml / 2,000ml</span></div>
+          <div style="display:flex; gap:4px;">
+            <button type="button" onclick="addWater(250)">+250ml</button>
+            <button type="button" onclick="addWater(-250)">-</button>
+          </div>
+        </div>
+        <div style="display:flex; gap:6px; margin-top:12px; align-items:center;">
+          <input type="number" id="dailyWeight" step="0.1" placeholder="오늘 체중(kg)" style="width:130px;" />
+          <button type="button" id="saveWeightBtn">체중 저장</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="layout">
+      <div class="card">
+        <h2>음식 검색 & 식단 추가</h2>
+        <div class="form-row">
+          <div class="field">
+            <label for="mealSelect">끼니</label>
+            <select id="mealSelect">
+              <option value="아침">아침</option>
+              <option value="점심">점심</option>
+              <option value="저녁">저녁</option>
+              <option value="간식">간식</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="servingSelect">분량 (배수)</label>
+            <select id="servingSelect">
+              <option value="0.5">0.5인분</option>
+              <option value="1" selected>1인분</option>
+              <option value="1.5">1.5인분</option>
+              <option value="2">2인분</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="foodSearch">음식 검색</label>
+            <input type="text" id="foodSearch" placeholder="예: 닭가슴살, 고구마, 샐러드" />
+          </div>
+        </div>
+
+        <div class="food-list" id="foodCatalog"></div>
+
+        <details style="margin-top:12px;">
+          <summary style="cursor:pointer; font-size:0.86rem; font-weight:600; color:var(--primary-dark);">+ 직접 음식 등록하기</summary>
+          <form id="customFoodForm" style="margin-top:10px;">
+            <div class="form-row">
+              <input type="text" id="cfName" placeholder="음식명 (1회 기준)" required />
+              <input type="number" id="cfKcal" placeholder="칼로리(kcal)" min="1" required />
+              <input type="number" id="cfCarb" placeholder="탄수(g)" min="0" step="0.1" value="0" />
+              <input type="number" id="cfProt" placeholder="단백(g)" min="0" step="0.1" value="0" />
+              <input type="number" id="cfFat" placeholder="지방(g)" min="0" step="0.1" value="0" />
+              <button type="submit" class="primary">등록 후 추가</button>
+            </div>
+          </form>
+        </details>
+      </div>
+
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <h2 style="margin:0;">오늘 먹은 기록</h2>
+          <button type="button" id="clearDayBtn" class="danger" style="padding:5px 10px; font-size:0.78rem;">오늘 기록 비우기</button>
+        </div>
+        <div id="mealLogs"></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>내 신체 정보 & 목표 칼로리 자동 계산</h2>
+      <form id="profileForm" class="form-row">
+        <div class="field">
+          <label for="pGender">성별</label>
+          <select id="pGender">
+            <option value="male">남성</option>
+            <option value="female">여성</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="pAge">나이</label>
+          <input type="number" id="pAge" value="35" min="10" max="100" />
+        </div>
+        <div class="field">
+          <label for="pHeight">키 (cm)</label>
+          <input type="number" id="pHeight" value="173" min="100" max="230" />
+        </div>
+        <div class="field">
+          <label for="pWeight">현재 체중 (kg)</label>
+          <input type="number" id="pWeight" value="75" step="0.1" min="30" max="250" />
+        </div>
+        <div class="field">
+          <label for="pActivity">활동량</label>
+          <select id="pActivity">
+            <option value="1.2">적음 (앉아서 생활)</option>
+            <option value="1.375" selected>보통 (주 1~3회 운동/이동)</option>
+            <option value="1.55">많음 (활동적/주 4~5회 운동)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="pGoal">목표</label>
+          <select id="pGoal">
+            <option value="-500" selected>체중 감량 (-500 kcal)</option>
+            <option value="-300">완만한 감량 (-300 kcal)</option>
+            <option value="0">체중 유지</option>
+            <option value="300">근육 증량 (+300 kcal)</option>
+          </select>
+        </div>
+        <div class="field" style="justify-content:flex-end;">
+          <button type="submit" class="primary">목표 적용</button>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <script>
+    const STORAGE_LOGS = "diet_planner_logs_v1";
+    const STORAGE_CUSTOM = "diet_planner_custom_foods_v1";
+    const STORAGE_PROFILE = "diet_planner_profile_v1";
+
+    const DEFAULT_FOODS = [
+      { name: "닭가슴살 (100g)", kcal: 110, carb: 0, prot: 23, fat: 1.2, tag: "고단백" },
+      { name: "삶은 달걀 (1개)", kcal: 78, carb: 0.6, prot: 6.3, fat: 5.3, tag: "고단백" },
+      { name: "현미밥 (150g)", kcal: 225, carb: 48, prot: 4.5, fat: 1.5, tag: "복합탄수" },
+      { name: "찐 고구마 (150g)", kcal: 195, carb: 45, prot: 2.3, fat: 0.2, tag: "복합탄수" },
+      { name: "오트밀 (40g)", kcal: 150, carb: 27, prot: 5.2, fat: 2.8, tag: "복합탄수" },
+      { name: "두부 반 모 (150g)", kcal: 120, carb: 3, prot: 12.5, fat: 6.5, tag: "식물성단백" },
+      { name: "연어구이 (100g)", kcal: 208, carb: 0, prot: 20, fat: 13.4, tag: "고단백" },
+      { name: "무가당 그릭요거트 (100g)", kcal: 95, carb: 4, prot: 10, fat: 4.5, tag: "간식" },
+      { name: "프로틴 쉐이크 (1스쿱)", kcal: 120, carb: 3, prot: 24, fat: 1.5, tag: "고단백" },
+      { name: "닭가슴살 샐러드 볼", kcal: 290, carb: 18, prot: 30, fat: 10, tag: "한끼" },
+      { name: "참치캔 기름 뺀 것 (100g)", kcal: 115, carb: 0, prot: 25, fat: 1, tag: "고단백" },
+      { name: "소고기 우둔살 구이 (100g)", kcal: 145, carb: 0, prot: 22, fat: 5.5, tag: "고단백" },
+      { name: "바나나 (1개)", kcal: 95, carb: 24, prot: 1.1, fat: 0.3, tag: "간식" },
+      { name: "사과 (1개 200g)", kcal: 105, carb: 27, prot: 0.5, fat: 0.3, tag: "간식" },
+      { name: "방울토마토 (150g)", kcal: 27, carb: 6, prot: 1.3, fat: 0.3, tag: "채소" },
+      { name: "브로콜리 데침 (100g)", kcal: 34, carb: 7, prot: 2.8, fat: 0.4, tag: "채소" },
+      { name: "아몬드 (10알 12g)", kcal: 70, carb: 2.5, prot: 2.5, fat: 6, tag: "건강지방" },
+      { name: "아보카도 (반 개 75g)", kcal: 120, carb: 6, prot: 1.5, fat: 11, tag: "건강지방" },
+      { name: "순두부찌개 (1인분, 밥 제외)", kcal: 280, carb: 12, prot: 18, fat: 17, tag: "외식" },
+      { name: "비빔밥 (1인분)", kcal: 560, carb: 88, prot: 18, fat: 14, tag: "외식" },
+      { name: "김치찌개 (1인분, 밥 제외)", kcal: 320, carb: 14, prot: 20, fat: 20, tag: "외식" },
+      { name: "편의점 훈제란 2구 + 두유", kcal: 245, carb: 14, prot: 19, fat: 12, tag: "간편식" },
+      { name: "아이스 아메리카노", kcal: 10, carb: 2, prot: 0.3, fat: 0, tag: "음료" },
+      { name: "떡볶이 (1인분)", kcal: 480, carb: 95, prot: 9, fat: 7, tag: "고칼로리" },
+      { name: "제육볶음 백반 (1인분)", kcal: 780, carb: 85, prot: 34, fat: 32, tag: "고칼로리" }
+    ];
+
+    let customFoods = JSON.parse(localStorage.getItem(STORAGE_CUSTOM) || "[]");
+    let allDayLogs = JSON.parse(localStorage.getItem(STORAGE_LOGS) || "{}");
+    let profile = JSON.parse(localStorage.getItem(STORAGE_PROFILE) || "null") || {
+      gender: "male", age: 35, height: 173, weight: 75, activity: 1.375, goalOffset: -500,
+      targetKcal: 1800, carbGoal: 180, protGoal: 135, fatGoal: 60
+    };
+
+    const dateInput = document.getElementById("activeDate");
+    dateInput.value = new Date().toISOString().slice(0, 10);
+
+    function getDayData(dateStr) {
+      if (!allDayLogs[dateStr]) allDayLogs[dateStr] = { meals: [], water: 0, weight: "" };
+      return allDayLogs[dateStr];
+    }
+
+    function saveAll() {
+      localStorage.setItem(STORAGE_LOGS, JSON.stringify(allDayLogs));
+      localStorage.setItem(STORAGE_CUSTOM, JSON.stringify(customFoods));
+      localStorage.setItem(STORAGE_PROFILE, JSON.stringify(profile));
+    }
+
+    function loadProfileInputs() {
+      document.getElementById("pGender").value = profile.gender;
+      document.getElementById("pAge").value = profile.age;
+      document.getElementById("pHeight").value = profile.height;
+      document.getElementById("pWeight").value = profile.weight;
+      document.getElementById("pActivity").value = String(profile.activity);
+      document.getElementById("pGoal").value = String(profile.goalOffset);
+    }
+
+    function renderCatalog() {
+      const q = document.getElementById("foodSearch").value.trim().toLowerCase();
+      const foods = [...customFoods, ...DEFAULT_FOODS].filter(f => !q || f.name.toLowerCase().includes(q) || (f.tag || "").toLowerCase().includes(q));
+      const el = document.getElementById("foodCatalog");
+      if (foods.length === 0) {
+        el.innerHTML = `<div class="empty">검색 결과가 없습니다. 아래에서 직접 등록할 수 있습니다.</div>`;
+        return;
+      }
+      el.innerHTML = foods.map((f, idx) => `
+        <div class="food-item">
+          <div>
+            <div><b>${escapeHtml(f.name)}</b> <span class="pill">${escapeHtml(f.tag || "사용자")}</span></div>
+            <div class="food-meta">${f.kcal} kcal · 탄 ${f.carb}g · 단 ${f.prot}g · 지 ${f.fat}g</div>
+          </div>
+          <button type="button" onclick='addFoodToMeal(${JSON.stringify(f).replace(/'/g, "&#39;")})'>+ 추가</button>
+        </div>
+      `).join("");
+    }
+
+    window.addFoodToMeal = function(food) {
+      const dateStr = dateInput.value;
+      const meal = document.getElementById("mealSelect").value;
+      const mult = parseFloat(document.getElementById("servingSelect").value || "1");
+      const day = getDayData(dateStr);
+      day.meals.push({
+        id: String(Date.now() + Math.random()),
+        meal,
+        name: mult === 1 ? food.name : `${food.name} × ${mult}`,
+        kcal: Math.round(food.kcal * mult),
+        carb: +(food.carb * mult).toFixed(1),
+        prot: +(food.prot * mult).toFixed(1),
+        fat: +(food.fat * mult).toFixed(1)
+      });
+      saveAll();
+      renderDay();
+    };
+
+    window.removeMealItem = function(id) {
+      const day = getDayData(dateInput.value);
+      day.meals = day.meals.filter(m => m.id !== id);
+      saveAll();
+      renderDay();
+    };
+
+    window.addWater = function(ml) {
+      const day = getDayData(dateInput.value);
+      day.water = Math.max(0, (day.water || 0) + ml);
+      saveAll();
+      renderDay();
+    };
+
+    function renderDay() {
+      const day = getDayData(dateInput.value);
+      let kcal = 0, carb = 0, prot = 0, fat = 0;
+      for (const m of day.meals) {
+        kcal += m.kcal; carb += m.carb; prot += m.prot; fat += m.fat;
+      }
+
+      document.getElementById("kcalConsumed").textContent = kcal.toLocaleString("ko-KR");
+      document.getElementById("kcalTarget").textContent = profile.targetKcal.toLocaleString("ko-KR");
+      const pct = Math.min(100, Math.round((kcal / Math.max(1, profile.targetKcal)) * 100));
+      const kcalBar = document.getElementById("kcalBar");
+      kcalBar.style.width = `${pct}%`;
+      kcalBar.style.background = kcal > profile.targetKcal ? "var(--danger)" : "var(--primary)";
+
+      const diff = profile.targetKcal - kcal;
+      document.getElementById("kcalRemainText").textContent = diff >= 0
+        ? `남은 칼로리: ${diff.toLocaleString("ko-KR")} kcal`
+        : `목표 초과: ${Math.abs(diff).toLocaleString("ko-KR")} kcal`;
+
+      document.getElementById("carbVal").textContent = carb.toFixed(1);
+      document.getElementById("carbGoal").textContent = profile.carbGoal;
+      document.getElementById("carbBar").style.width = `${Math.min(100, Math.round((carb / Math.max(1, profile.carbGoal)) * 100))}%`;
+
+      document.getElementById("protVal").textContent = prot.toFixed(1);
+      document.getElementById("protGoal").textContent = profile.protGoal;
+      document.getElementById("protBar").style.width = `${Math.min(100, Math.round((prot / Math.max(1, profile.protGoal)) * 100))}%`;
+
+      document.getElementById("fatVal").textContent = fat.toFixed(1);
+      document.getElementById("fatGoal").textContent = profile.fatGoal;
+      document.getElementById("fatBar").style.width = `${Math.min(100, Math.round((fat / Math.max(1, profile.fatGoal)) * 100))}%`;
+
+      document.getElementById("waterVal").textContent = (day.water || 0).toLocaleString("ko-KR");
+      document.getElementById("dailyWeight").value = day.weight || "";
+
+      const mealOrder = ["아침", "점심", "저녁", "간식"];
+      const logsEl = document.getElementById("mealLogs");
+      if (day.meals.length === 0) {
+        logsEl.innerHTML = `<div class="empty">아직 기록된 식단이 없습니다. 왼쪽에서 음식을 추가하거나 상단 <b>오늘 식단 자동 추천</b>을 눌러보세요.</div>`;
+        return;
+      }
+
+      logsEl.innerHTML = mealOrder.map(mealName => {
+        const items = day.meals.filter(m => m.meal === mealName);
+        if (items.length === 0) return "";
+        const sumKcal = items.reduce((s, i) => s + i.kcal, 0);
+        return `
+          <div class="meal-section">
+            <div class="meal-header"><span>${mealName}</span><span>${sumKcal} kcal</span></div>
+            ${items.map(i => `
+              <div class="log-row">
+                <div>
+                  <div>${escapeHtml(i.name)}</div>
+                  <div class="food-meta">${i.kcal} kcal · 탄 ${i.carb}g · 단 ${i.prot}g · 지 ${i.fat}g</div>
+                </div>
+                <button type="button" onclick="removeMealItem('${i.id}')" style="padding:3px 8px; font-size:0.75rem;">삭제</button>
+              </div>
+            `).join("")}
+          </div>
+        `;
+      }).join("");
+    }
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m]));
+    }
+
+    document.getElementById("profileForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const gender = document.getElementById("pGender").value;
+      const age = parseInt(document.getElementById("pAge").value, 10);
+      const height = parseFloat(document.getElementById("pHeight").value);
+      const weight = parseFloat(document.getElementById("pWeight").value);
+      const activity = parseFloat(document.getElementById("pActivity").value);
+      const goalOffset = parseInt(document.getElementById("pGoal").value, 10);
+
+      const bmr = gender === "male"
+        ? (10 * weight + 6.25 * height - 5 * age + 5)
+        : (10 * weight + 6.25 * height - 5 * age - 161);
+      const targetKcal = Math.max(1200, Math.round(bmr * activity + goalOffset));
+      const carbGoal = Math.round((targetKcal * 0.4) / 4);
+      const protGoal = Math.round((targetKcal * 0.3) / 4);
+      const fatGoal = Math.round((targetKcal * 0.3) / 9);
+
+      profile = { gender, age, height, weight, activity, goalOffset, targetKcal, carbGoal, protGoal, fatGoal };
+      saveAll();
+      renderDay();
+      alert(`목표가 업데이트되었습니다: 하루 ${targetKcal.toLocaleString("ko-KR")} kcal (탄 ${carbGoal}g / 단 ${protGoal}g / 지 ${fatGoal}g)`);
+    });
+
+    document.getElementById("customFoodForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const food = {
+        name: document.getElementById("cfName").value.trim(),
+        kcal: parseFloat(document.getElementById("cfKcal").value) || 0,
+        carb: parseFloat(document.getElementById("cfCarb").value) || 0,
+        prot: parseFloat(document.getElementById("cfProt").value) || 0,
+        fat: parseFloat(document.getElementById("cfFat").value) || 0,
+        tag: "내 음식"
+      };
+      if (!food.name || food.kcal <= 0) return;
+      customFoods.unshift(food);
+      window.addFoodToMeal(food);
+      e.target.reset();
+      renderCatalog();
+    });
+
+    document.getElementById("recommendBtn").addEventListener("click", () => {
+      const dateStr = dateInput.value;
+      const day = getDayData(dateStr);
+      if (day.meals.length > 0 && !confirm("오늘 기존 식단을 지우고 목표 칼로리에 맞춘 추천 식단으로 채울까요?")) return;
+
+      const t = profile.targetKcal;
+      const plan = [
+        { meal: "아침", food: DEFAULT_FOODS[4] },  // 오트밀
+        { meal: "아침", food: DEFAULT_FOODS[1] },  // 삶은 달걀
+        { meal: "아침", food: DEFAULT_FOODS[1] },  // 삶은 달걀
+        { meal: "점심", food: DEFAULT_FOODS[2] },  // 현미밥
+        { meal: "점심", food: DEFAULT_FOODS[0] },  // 닭가슴살
+        { meal: "점심", food: DEFAULT_FOODS[15] }, // 브로콜리
+        { meal: "저녁", food: DEFAULT_FOODS[9] },  // 닭가슴살 샐러드 볼
+        { meal: "저녁", food: DEFAULT_FOODS[3] },  // 찐 고구마
+        { meal: "간식", food: DEFAULT_FOODS[7] },  // 그릭요거트
+        { meal: "간식", food: DEFAULT_FOODS[16] }  // 아몬드
+      ];
+      if (t >= 2000) {
+        plan.push({ meal: "저녁", food: DEFAULT_FOODS[6] }); // 연어구이
+        plan.push({ meal: "간식", food: DEFAULT_FOODS[8] }); // 프로틴 쉐이크
+      }
+      day.meals = plan.map(p => ({
+        id: String(Date.now() + Math.random()),
+        meal: p.meal,
+        name: p.food.name,
+        kcal: p.food.kcal,
+        carb: p.food.carb,
+        prot: p.food.prot,
+        fat: p.food.fat
+      }));
+      saveAll();
+      renderDay();
+    });
+
+    document.getElementById("saveWeightBtn").addEventListener("click", () => {
+      const w = document.getElementById("dailyWeight").value;
+      getDayData(dateInput.value).weight = w;
+      saveAll();
+      alert("체중이 저장되었습니다.");
+    });
+
+    document.getElementById("clearDayBtn").addEventListener("click", () => {
+      if (!confirm("오늘 기록된 식단을 모두 삭제할까요?")) return;
+      getDayData(dateInput.value).meals = [];
+      saveAll();
+      renderDay();
+    });
+
+    document.getElementById("exportBtn").addEventListener("click", () => {
+      const rows = [["날짜", "체중(kg)", "수분(ml)", "끼니", "음식명", "칼로리(kcal)", "탄수화물(g)", "단백질(g)", "지방(g)"]];
+      for (const dateStr of Object.keys(allDayLogs).sort()) {
+        const d = allDayLogs[dateStr];
+        for (const m of (d.meals || [])) {
+          rows.push([dateStr, d.weight || "", d.water || 0, m.meal, `"${m.name.replace(/"/g, '""')}"`, m.kcal, m.carb, m.prot, m.fat]);
+        }
+      }
+      if (rows.length === 1) return alert("내보낼 식단 기록이 없습니다.");
+      const csv = "\uFEFF" + rows.map(r => r.join(",")).join("\n");
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `다이어트_식단기록_${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    document.getElementById("foodSearch").addEventListener("input", renderCatalog);
+    dateInput.addEventListener("change", renderDay);
+
+    loadProfileInputs();
+    renderCatalog();
+    renderDay();
+  </script>
+</body>
+</html>
