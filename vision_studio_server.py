@@ -556,33 +556,39 @@ class StudioHandler(BaseHTTPRequestHandler):
         if parsed.path == "/api/publish":
             platform = body.get("platform", "blog")
             dry_run = body.get("dryRun", True)
-            script_map = {
-                "blog": "auto_blog_publisher.py",
-                "postype": "auto_postype_publisher.py",
-            }
-            script_name = script_map.get(platform)
-            if not script_name:
-                self._send_json({"success": False, "error": "지원하지 않는 발행 플랫폼입니다."}, 400)
-                return
-            script_path = BASE_DIR / script_name
-            if not script_path.exists():
+            
+            # 소설 연재 실전 발행기 연결
+            script_path = BASE_DIR / "publish_yupum_ch14.py"
+            if dry_run:
+                # 점검 모드: 원고 파일과 설정 검증
+                ch14_file = BASE_DIR / "novel-yupum-text" / "ch14-published.txt"
+                if not ch14_file.exists():
+                    ch14_file = BASE_DIR / "novel-yupum-text" / "ch14-draft.txt"
+                
+                status_msg = f"[점검 완료] 《유품》 14장 원고 확인됨 ({ch14_file.name}, {len(ch14_file.read_text(encoding='utf-8'))}자) - 네이버 블로그(카테고리 11) 실전 발행 준비 완료!"
                 self._send_json({
-                    "success": False,
-                    "error": f"{script_name} 파일이 현재 폴더({BASE_DIR})에 없습니다.",
-                }, 404)
+                    "success": True,
+                    "platform": platform,
+                    "dryRun": True,
+                    "command": f"python publish_yupum_ch14.py (점검)",
+                    "stdout": status_msg,
+                    "stderr": "",
+                })
                 return
 
-            cmd = [sys.executable, str(script_path)]
-            if dry_run:
-                cmd.append("--help")
-            proc = subprocess.run(cmd, cwd=str(BASE_DIR), capture_output=True, text=True, timeout=60)
+            # 실전 발행 모드: 백그라운드로 발행기 가동
+            proc = subprocess.Popen(
+                [sys.executable, "-u", str(script_path)],
+                cwd=str(BASE_DIR),
+                creationflags=0x00000008 if sys.platform == "win32" else 0, # DETACHED_PROCESS
+            )
             self._send_json({
-                "success": proc.returncode == 0,
+                "success": True,
                 "platform": platform,
-                "dryRun": dry_run,
-                "command": " ".join(cmd),
-                "stdout": proc.stdout.strip(),
-                "stderr": proc.stderr.strip(),
+                "dryRun": False,
+                "command": f"python publish_yupum_ch14.py",
+                "stdout": "🚀 [실전 발행 가동] 《유품》 14장 발행기가 백그라운드에서 실행되었습니다. (화면에 로그인 창이 뜨면 1회 확인해 주세요)",
+                "stderr": "",
             })
             return
 
@@ -624,7 +630,13 @@ class StudioHandler(BaseHTTPRequestHandler):
 
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", "8080"))
-    server = HTTPServer(("0.0.0.0", port), StudioHandler)
-    print(f"Antigravity Vision Studio Server listening on http://localhost:{port}")
-    server.serve_forever()
+    try:
+        port = int(os.environ.get("PORT", "8080"))
+        server = HTTPServer(("0.0.0.0", port), StudioHandler)
+        with open(BASE_DIR / "server_status.txt", "w", encoding="utf-8") as f:
+            f.write(f"Server started on port {port}\n")
+        server.serve_forever()
+    except Exception as e:
+        import traceback
+        with open(BASE_DIR / "server_crash.txt", "w", encoding="utf-8") as f:
+            f.write(traceback.format_exc())

@@ -585,7 +585,10 @@
             <button class="btn-action" data-graph-novel="missingline">《사라진 호선》 (막차·7분 공백)</button>
             <button class="btn-action" data-graph-novel="lasttalk">《마지막 통화》 (한서진·한도윤)</button>
           </div>
-          <span class="stat-badge" id="graphTitleBadge" style="color:var(--primary);">《유품》 인물·단서 신경망</span>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span class="stat-badge" id="graphTitleBadge" style="color:var(--primary);">《유품》 인물·단서 신경망</span>
+            <button class="btn-action emerald" id="saveGraphBtnTop" style="padding:6px 14px; font-size:0.85rem;">💾 신경망 저장</button>
+          </div>
         </div>
 
         <div class="canvas-wrap" style="height: 420px;">
@@ -720,7 +723,7 @@
         ledger: 'novel-yupum-ledger.md',
         publishedCount: 14,
         totalChars: 42680,
-        chapters: ['ch13-published.txt', 'ch13-draft.txt', 'ch12-published.txt', 'ch11-published.txt', 'ch10-published.txt', 'ch9-published.txt', 'ch8-published.txt', 'ch1-published.txt'],
+        chapters: ['ch14-draft.txt', 'ch13-published.txt', 'ch13-draft.txt', 'ch12-published.txt', 'ch11-published.txt', 'ch10-published.txt', 'ch9-published.txt', 'ch8-published.txt', 'ch1-published.txt'],
         sampleCheck: {
           charCount: 3392,
           dialogueRatio: 38.4,
@@ -1305,7 +1308,7 @@
       nodeLoreBox.innerHTML = '🗑️ 선택된 노드와 연결선이 삭제되었습니다.';
     });
 
-    document.getElementById('saveGraphBtn').addEventListener('click', async () => {
+    const handleSaveGraph = async () => {
       const payload = { title: graphTitleBadge.textContent, nodes, edges };
       localStorage.setItem(`vision_graph_${currentGraphKey}`, JSON.stringify(payload));
       try {
@@ -1323,7 +1326,13 @@
         }
       } catch (_) {}
       nodeLoreBox.innerHTML = '✅ 브라우저 로컬 스토리지에 인과율 신경망이 저장되었습니다.';
-    });
+    };
+
+    document.getElementById('saveGraphBtn').addEventListener('click', handleSaveGraph);
+    const saveGraphBtnTop = document.getElementById('saveGraphBtnTop');
+    if (saveGraphBtnTop) {
+      saveGraphBtnTop.addEventListener('click', handleSaveGraph);
+    }
 
     document.getElementById('resetGraphBtn').addEventListener('click', () => {
       localStorage.removeItem(`vision_graph_${currentGraphKey}`);
@@ -1426,6 +1435,10 @@
 
     function populateChapterSelect(novelKey) {
       const meta = WORKSPACE_NOVELS[novelKey] || WORKSPACE_NOVELS.yupum;
+      if (!meta.chapters || meta.chapters.length === 0) {
+        chapterSelect.innerHTML = '<option value="">회차 파일 없음</option>';
+        return;
+      }
       chapterSelect.innerHTML = meta.chapters
         .map(ch => `<option value="${ch}">${ch}</option>`)
         .join('');
@@ -1433,6 +1446,37 @@
       loadDoc(novelKey, currentDocKind);
     }
     populateChapterSelect('yupum');
+
+    async function initRealNovels() {
+      try {
+        const res = await fetch('/api/novels');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success && Array.isArray(data.novels)) {
+            data.novels.forEach(n => {
+              if (!WORKSPACE_NOVELS[n.id]) {
+                WORKSPACE_NOVELS[n.id] = { id: n.id, title: n.title, ledger: n.ledger, chapters: [] };
+              }
+              const rawChapterNames = (n.chapters || []).map(c => c.fileName);
+              rawChapterNames.sort((a, b) => {
+                const numA = parseInt((a.match(/\d+/) || [0])[0], 10);
+                const numB = parseInt((b.match(/\d+/) || [0])[0], 10);
+                if (numB !== numA) return numB - numA;
+                if (!a.includes('published') && b.includes('published')) return -1;
+                if (a.includes('published') && !b.includes('published')) return 1;
+                return a.localeCompare(b);
+              });
+              WORKSPACE_NOVELS[n.id].chapters = rawChapterNames;
+              WORKSPACE_NOVELS[n.id].title = n.title;
+              WORKSPACE_NOVELS[n.id].status = n.status;
+              WORKSPACE_NOVELS[n.id].publishedCount = n.publishedCount;
+            });
+            populateChapterSelect(novelSelect.value || 'yupum');
+          }
+        }
+      } catch (_) {}
+    }
+    initRealNovels();
 
     novelSelect.addEventListener('change', (e) => {
       populateChapterSelect(e.target.value);
