@@ -77,18 +77,18 @@
 2. **[실업급여 수급자격 및 단계별 신청 체크리스트 (PDF/MD)]**
 3. **[임금체불 및 퇴직금 미지급 시 사업주 발송용 내용증명 & 노동청 진정서 서식]**
 
-👉 **[퇴직금 & 실업급여 원클릭 모의 계산기 웹에서 바로 실행하기](https://kwonflower831-cell.github.io/naver-blog-novels/content-templates/severance-and-unemployment-kit/%ED%87%B4%EC%A7%81%EA%B8%88_%EC%8B%A4%EC%97%85%EA%B8%89%EC%97%AC_%EC%9E%90%EB%8F%99%EA%B3%84%EC%82%B0%EA%B8%B0.html)**
-(링크: https://kwonflower831-cell.github.io/naver-blog-novels/content-templates/severance-and-unemployment-kit/퇴직금_실업급여_자동계산기.html )
+👉 **[퇴직금 & 실업급여 원클릭 모의 계산기 웹에서 바로 실행하기](https://kwonflower831-cell.github.io/naver-blog-novels/severance-calculator.html)**
+(링크: https://kwonflower831-cell.github.io/naver-blog-novels/severance-calculator.html )
 
 ---
 
 ### 📌 [함께 보면 내 통장 지키는 생활 실무 시리즈]
 * 🏠 **[전월세 계약 전 꼭 봐야 할 안전 체크리스트 & 필수 특약 7선 (보증금 내용증명 양식)]**  
   👉 블로그 글 보기: https://blog.naver.com/kwonflower58/224476488974  
-  👉 계산기 바로 실행: https://kwonflower831-cell.github.io/naver-blog-novels/content-templates/jeonse-protection-kit/전월세_안전진단_계산기.html
+  👉 계산기 바로 실행: https://kwonflower831-cell.github.io/naver-blog-novels/jeonse-calculator.html
 * 💳 **[2026 숨은 돈 찾기 & 연말정산 환급금 꿀팁 (월세 5년 치 경정청구 서식)]**  
   👉 블로그 글 보기: https://blog.naver.com/kwonflower58/224476489872  
-  👉 계산기 바로 실행: https://kwonflower831-cell.github.io/naver-blog-novels/content-templates/tax-refund-and-hidden-money-kit/숨은환급금_절세항목_자동계산기.html
+  👉 계산기 바로 실행: https://kwonflower831-cell.github.io/naver-blog-novels/tax-calculator.html
 
 ---
 

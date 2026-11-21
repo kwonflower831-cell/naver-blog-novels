@@ -64,18 +64,18 @@
 2. **[정부 공인 숨은 돈 5대 포털 원클릭 바로가기 체크리스트]**
 3. **[월세 세액공제 경정청구 홈택스 신청 6단계 가이드 & 서식]**
 
-👉 **[2026 연말정산 & 월세 세액공제 모의 계산기 웹에서 바로 실행하기](https://kwonflower831-cell.github.io/naver-blog-novels/content-templates/tax-refund-and-hidden-money-kit/%EC%88%A8%EC%9D%80%ED%99%98%EA%B8%89%EA%B8%88_%EC%A0%88%EC%84%B8%ED%95%AD%EB%AA%A9_%EC%9E%90%EB%8F%99%EA%B3%84%EC%82%B0%EA%B8%B0.html)**
-(링크: https://kwonflower831-cell.github.io/naver-blog-novels/content-templates/tax-refund-and-hidden-money-kit/숨은환급금_절세항목_자동계산기.html )
+👉 **[2026 연말정산 & 월세 세액공제 모의 계산기 웹에서 바로 실행하기](https://kwonflower831-cell.github.io/naver-blog-novels/tax-calculator.html)**
+(링크: https://kwonflower831-cell.github.io/naver-blog-novels/tax-calculator.html )
 
 ---
 
 ### 📌 [함께 보면 내 통장 지키는 생활 실무 시리즈]
 * 🏠 **[전월세 계약 전 꼭 봐야 할 안전 체크리스트 & 필수 특약 7선 (보증금 내용증명 양식)]**  
   👉 블로그 글 보기: https://blog.naver.com/kwonflower58/224476488974  
-  👉 계산기 바로 실행: https://kwonflower831-cell.github.io/naver-blog-novels/content-templates/jeonse-protection-kit/전월세_안전진단_계산기.html
+  👉 계산기 바로 실행: https://kwonflower831-cell.github.io/naver-blog-novels/jeonse-calculator.html
 * 💰 **[2026 퇴직금 & 실업급여 모의 계산기 & 자진퇴사 10대 예외 조건 총정리]**  
   👉 블로그 글 보기: https://blog.naver.com/kwonflower58/224476489537  
-  👉 계산기 바로 실행: https://kwonflower831-cell.github.io/naver-blog-novels/content-templates/severance-and-unemployment-kit/퇴직금_실업급여_자동계산기.html
+  👉 계산기 바로 실행: https://kwonflower831-cell.github.io/naver-blog-novels/severance-calculator.html
 
 ---
 

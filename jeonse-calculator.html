@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>전·월세 보증금 안전 진단 & 최우선변제금 계산기</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --safe: #10b981;
+      --warn: #f59e0b;
+      --danger: #ef4444;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Segoe UI", Roboto, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); padding: 24px 16px; line-height: 1.6; }
+    .container { max-width: 640px; margin: 0 auto; background: var(--card-bg); border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); padding: 28px 24px; }
+    header { text-align: center; margin-bottom: 24px; }
+    header h1 { font-size: 1.5rem; color: #0f172a; margin-bottom: 6px; }
+    header p { font-size: 0.9rem; color: var(--text-muted); }
+    .badge { display: inline-block; padding: 4px 10px; background: #eff6ff; color: var(--primary); font-size: 0.75rem; font-weight: 600; border-radius: 999px; margin-bottom: 8px; }
+    
+    .form-group { margin-bottom: 18px; }
+    label { display: block; font-size: 0.88rem; font-weight: 600; margin-bottom: 6px; color: #334155; }
+    .input-wrapper { position: relative; display: flex; align-items: center; }
+    input, select { width: 100%; padding: 12px 14px; font-size: 1rem; border: 1.5px solid var(--border); border-radius: 8px; outline: none; transition: border-color 0.2s; }
+    input:focus, select:focus { border-color: var(--primary); }
+    .unit { position: absolute; right: 14px; color: var(--text-muted); font-size: 0.9rem; pointer-events: none; }
+    
+    .btn-calc { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 1.05rem; font-weight: 600; cursor: pointer; transition: background 0.2s; margin-top: 10px; }
+    .btn-calc:hover { background: var(--primary-hover); }
+
+    .result-box { margin-top: 28px; padding: 20px; border-radius: 12px; background: #f1f5f9; display: none; }
+    .result-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
+    .risk-tag { font-size: 0.85rem; font-weight: 700; padding: 4px 12px; border-radius: 6px; color: white; }
+    .stat-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.95rem; }
+    .stat-row strong { color: #0f172a; }
+    
+    .advice-card { margin-top: 16px; padding: 14px; background: white; border-radius: 8px; border-left: 4px solid var(--primary); font-size: 0.88rem; color: #334155; }
+    .advice-card h4 { font-size: 0.92rem; margin-bottom: 4px; color: #0f172a; }
+
+    footer { text-align: center; margin-top: 24px; font-size: 0.8rem; color: var(--text-muted); }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <span class="badge">소중한 내 보증금 지키기</span>
+    <h1>전·월세 보증금 안전 진단기</h1>
+    <p>매매가 대비 부채비율 및 소액임차인 최우선변제금 해당 여부를 즉시 계산합니다.</p>
+  </header>
+
+  <div class="form-group">
+    <label for="marketPrice">주택 매매 추정 시세 (실거래가 기준)</label>
+    <div class="input-wrapper">
+      <input type="number" id="marketPrice" placeholder="예: 30000 (3억 원)">
+      <span class="unit">만원</span>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="seniorDebt">선순위 근저당 (집주인 대출 총액)</label>
+    <div class="input-wrapper">
+      <input type="number" id="seniorDebt" placeholder="대출 없으면 0 입력" value="0">
+      <span class="unit">만원</span>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="myDeposit">내 전세(또는 월세) 보증금</label>
+    <div class="input-wrapper">
+      <input type="number" id="myDeposit" placeholder="예: 18000 (1억 8천만 원)">
+      <span class="unit">만원</span>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="region">소재지 (최우선변제금 기준 지역)</label>
+    <select id="region">
+      <option value="seoul">서울특별시 (기준 1억 6,500만 원 이하)</option>
+      <option value="overcrowded">과밀억제권역 / 세종 / 용인 / 화성 / 김포 (기준 1억 4,500만 원 이하)</option>
+      <option value="metropolitan">광역시(군 제외) / 안산 / 광주 / 파주 / 이천 / 평택 (기준 8,500만 원 이하)</option>
+      <option value="others">기타 지역 (기준 7,500만 원 이하)</option>
+    </select>
+  </div>
+
+  <button class="btn-calc" onclick="calculateRisk()">보증금 안전도 진단하기</button>
+
+  <div id="resultBox" class="result-box">
+    <div class="result-header">
+      <span style="font-weight: 700; font-size: 1.05rem;">진단 결과</span>
+      <span id="riskTag" class="risk-tag">안전</span>
+    </div>
+
+    <div class="stat-row">
+      <span>총 부채비율 (선순위대출+보증금):</span>
+      <strong id="debtRatioText">0%</strong>
+    </div>
+    <div class="stat-row">
+      <span>경매 시 회수 가능 여유:</span>
+      <strong id="marginText">0 만원</strong>
+    </div>
+    <div class="stat-row">
+      <span>소액임차인 최우선변제:</span>
+      <strong id="priorityRepayText">해당 없음</strong>
+    </div>
+
+    <div class="advice-card">
+      <h4 id="adviceTitle">💡 맞춤형 가이드</h4>
+      <div id="adviceContent"></div>
+    </div>
+  </div>
+
+  <footer>
+    <p>※ 본 계산기는 참고용 진단 도구이며, 실제 계약 전 반드시 등기부등본 원본과 전문가 검토를 거치시기 바랍니다.</p>
+  </footer>
+</div>
+
+<script>
+function calculateRisk() {
+  const price = parseFloat(document.getElementById('marketPrice').value) || 0;
+  const debt = parseFloat(document.getElementById('seniorDebt').value) || 0;
+  const deposit = parseFloat(document.getElementById('myDeposit').value) || 0;
+  const region = document.getElementById('region').value;
+
+  if (price <= 0 || deposit <= 0) {
+    alert('매매 시세와 보증금을 정확히 입력해 주세요.');
+    return;
+  }
+
+  const totalDebt = debt + deposit;
+  const debtRatio = ((totalDebt / price) * 100).toFixed(1);
+  const margin = Math.round(price * 0.7 - totalDebt);
+
+  // 최우선변제금 기준 (현행 주택임대차보호법 시행령 기준)
+  let limitDeposit = 0;
+  let maxProtection = 0;
+  if (region === 'seoul') {
+    limitDeposit = 16500;
+    maxProtection = 5500;
+  } else if (region === 'overcrowded') {
+    limitDeposit = 14500;
+    maxProtection = 4800;
+  } else if (region === 'metropolitan') {
+    limitDeposit = 8500;
+    maxProtection = 2800;
+  } else {
+    limitDeposit = 7500;
+    maxProtection = 2500;
+  }
+
+  const isPriority = deposit <= limitDeposit;
+
+  // UI 업데이트
+  const box = document.getElementById('resultBox');
+  const riskTag = document.getElementById('riskTag');
+  const debtRatioText = document.getElementById('debtRatioText');
+  const marginText = document.getElementById('marginText');
+  const priorityRepayText = document.getElementById('priorityRepayText');
+  const adviceTitle = document.getElementById('adviceTitle');
+  const adviceContent = document.getElementById('adviceContent');
+
+  box.style.display = 'block';
+  debtRatioText.innerText = `${debtRatio}% (총 ${totalDebt.toLocaleString()}만원)`;
+
+  if (margin >= 0) {
+    marginText.innerText = `약 ${margin.toLocaleString()}만원 안전 여유 (70% 낙찰 기준)`;
+    marginText.style.color = '#10b981';
+  } else {
+    marginText.innerText = `약 ${Math.abs(margin).toLocaleString()}만원 손실 위험 (70% 낙찰 기준)`;
+    marginText.style.color = '#ef4444';
+  }
+
+  if (isPriority) {
+    priorityRepayText.innerText = `적용 대상 (경매 시 최대 ${maxProtection.toLocaleString()}만원 최우선 배당)`;
+    priorityRepayText.style.color = '#10b981';
+  } else {
+    priorityRepayText.innerText = `적용 불가 (기준보증금 ${limitDeposit.toLocaleString()}만원 초과)`;
+    priorityRepayText.style.color = '#64748b';
+  }
+
+  // 위험도 판정
+  if (debtRatio <= 60) {
+    riskTag.innerText = '안전 (양호)';
+    riskTag.style.backgroundColor = 'var(--safe)';
+    adviceTitle.innerText = '✅ 권리관계가 비교적 안전한 매물입니다';
+    adviceContent.innerHTML = '총 부채비율이 60% 이하로 안정적입니다. 단, 잔금일까지 추가 대출이 발생하지 않도록 <strong>"잔금 익일까지 권리변동 금지 특약"</strong>과 <strong>"전세보증보험 가입 특약"</strong>은 반드시 명시하세요.';
+  } else if (debtRatio <= 75) {
+    riskTag.innerText = '주의 (주의 요망)';
+    riskTag.style.backgroundColor = 'var(--warn)';
+    adviceTitle.innerText = '⚠️ 신중한 접근과 보증보험 가입 필수';
+    adviceContent.innerHTML = '부채비율이 60~75% 구간입니다. 집값이 소폭 하락하거나 경매로 넘어갈 경우 보증금 전액 회수가 지연될 수 있습니다. <strong>HUG/SGI 전세보증금 반환보증 가입 가능 여부를 계약 전 확인</strong>하고, 거절 시 계약금 전액 반환 특약을 꼭 넣으세요.';
+  } else {
+    riskTag.innerText = '위험 (깡통전세 위험)';
+    riskTag.style.backgroundColor = 'var(--danger)';
+    adviceTitle.innerText = '🚨 깡통전세 위험! 계약을 재검토하세요';
+    adviceContent.innerHTML = '총 부채비율이 75%를 초과하여 경매 진행 시 보증금 손실 위험이 매우 높습니다. 빌라/오피스텔의 경우 특히 위험합니다. 보증금을 낮추고 월세로 전환하거나, 보증보험 가입이 100% 확정되지 않는다면 계약을 피하시는 것을 강력히 권장합니다.';
+  }
+}
+</script>
+
+</body>
+</html>

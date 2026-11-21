@@ -30,6 +30,6 @@
 
 ## 🧮 생활 실무 웹 계산기 바로가기
 
-- [🏠 전월세 보증금 안전진단 계산기](./content-templates/jeonse-protection-kit/전월세_안전진단_계산기.html)
-- [💳 2026 숨은환급금 & 월세 세액공제 계산기](./content-templates/tax-refund-and-hidden-money-kit/숨은환급금_절세항목_자동계산기.html)
-- [💰 2026 퇴직금 & 실업급여 자동계산기](./content-templates/severance-and-unemployment-kit/퇴직금_실업급여_자동계산기.html)
+- [🏠 전월세 보증금 안전진단 계산기](https://kwonflower831-cell.github.io/naver-blog-novels/jeonse-calculator.html)
+- [💳 2026 숨은환급금 & 월세 세액공제 계산기](https://kwonflower831-cell.github.io/naver-blog-novels/tax-calculator.html)
+- [💰 2026 퇴직금 & 실업급여 자동계산기](https://kwonflower831-cell.github.io/naver-blog-novels/severance-calculator.html)
