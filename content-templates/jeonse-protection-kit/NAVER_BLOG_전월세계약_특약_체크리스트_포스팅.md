@@ -87,17 +87,20 @@
 2. **[계약서에 그대로 복사해 쓰는 필수 특약 7선 원문]**
 3. **[보증금 반환 지연 시 집주인에게 보내는 공문 표준 내용증명 서식]**
 
-*(※ 본 포스팅 상단/하단 첨부파일을 다운로드해 가세요!)*
+👉 **[보증금 안전진단 계산기 웹에서 바로 실행하기](https://kwonflower831-cell.github.io/naver-blog-novels/content-templates/jeonse-protection-kit/%EC%A0%84%EC%9B%94%EC%84%B8_%EC%95%88%EC%A0%95%EC%A7%84%EB%8B%A8_%EA%B3%84%EC%82%B0%EA%B8%B0.html)**
+(링크: https://kwonflower831-cell.github.io/naver-blog-novels/content-templates/jeonse-protection-kit/전월세_안전진단_계산기.html )
 
-혹시 내 보증금이 안전한지, 최우선변제금 범위에 들어오는지 바로 계산해보고 싶으신 분들을 위해 **[보증금 안전진단 계산기]** 파일도 함께 첨부해 두었으니 유용하게 활용하시기 바랍니다.
+내 보증금이 안전한지, 최우선변제금 범위에 들어오는지 다운로드 없이 스마트폰이나 PC 웹에서 바로 숫자를 넣어 계산해 보실 수 있습니다.
 
 ---
 
 ### 📌 [함께 보면 내 통장 지키는 생활 실무 시리즈]
 * 💰 **[2026 퇴직금 & 실업급여 모의 계산기 & 자진퇴사 10대 예외 조건 총정리]**  
-  👉 *(※ 실업급여 포스팅 링크를 여기에 연결하세요!)*
+  👉 블로그 글 보기: https://blog.naver.com/kwonflower58/224476489537  
+  👉 계산기 바로 실행: https://kwonflower831-cell.github.io/naver-blog-novels/content-templates/severance-and-unemployment-kit/퇴직금_실업급여_자동계산기.html
 * 💳 **[2026 숨은 돈 찾기 & 연말정산 환급금 꿀팁 (월세 5년 치 경정청구 서식)]**  
-  👉 *(※ 숨은 환급금 포스팅 링크를 여기에 연결하세요!)*
+  👉 블로그 글 보기: https://blog.naver.com/kwonflower58/224476489872  
+  👉 계산기 바로 실행: https://kwonflower831-cell.github.io/naver-blog-novels/content-templates/tax-refund-and-hidden-money-kit/숨은환급금_절세항목_자동계산기.html
 
 ---
 
